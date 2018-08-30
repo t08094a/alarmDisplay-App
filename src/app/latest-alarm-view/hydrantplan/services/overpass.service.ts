@@ -3,7 +3,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { LatLngBounds } from 'leaflet';
 import { Observable } from 'rxjs';
-import { HttpResponse } from 'selenium-webdriver/http';
 
 @Injectable()
 export class OverpassService {

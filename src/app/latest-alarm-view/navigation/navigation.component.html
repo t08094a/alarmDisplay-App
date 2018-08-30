@@ -5,7 +5,8 @@
 
 <!-- This creates a google map -->
 <agm-map [zoom]="zoom" [zoomControl]="false" mapTypeId="roadmap"
+         [latitude]="startLocation.lat" [longitude]="startLocation.lng"
          [disableDoubleClickZoom]="true" [streetViewControl]="false"
          [usePanning]="true" (mapClick)="onMapClicked($event)" >
-    <agm-direction *ngIf="dir" [origin]="dir.origin" [destination]="dir.destination" [travelMode]="dir.travelMode"></agm-direction>
+         <agm-direction *ngIf="dir" [origin]="dir.origin" [destination]="dir.destination" [travelMode]="dir.travelMode"></agm-direction>
 </agm-map>
