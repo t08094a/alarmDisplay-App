@@ -8,8 +8,9 @@ import { Title } from '@angular/platform-browser';
     styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-    title = environment.applicationTitle;
-    appVersion = environment.VERSION;
+    title: string = environment.applicationTitle;
+    appVersion: string = environment.VERSION;
+    production: string = environment.production ? 'production' : 'development';
 
     public constructor(private titleService: Title) {
         this.titleService.setTitle(environment.applicationTitle);

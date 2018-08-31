@@ -1,26 +1,33 @@
+#########################
+### build environment ###
+#########################
+
 # use latest LTS version
-FROM node:carbon
+FROM node:alpine as builder
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
-# Install app dependencies
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
-# where available (npm@5+)
-COPY package*.json ./
+# install and cache app dependencies
+COPY package*.json /app/
+RUN yarn install
 
-RUN npm install 
+# copy sources to app directory
+COPY . /app
 
-# If you are building your code for production
-#RUN npm install --only=production
+# build the angular app in production mode and store the artifacts in dist folder
+RUN yarn build
 
-# Bundle app source
-COPY . .
 
-# Use port 8080 for the app
-EXPOSE 8080
+##################
+### production ###
+##################
+FROM nginx:alpine
 
-# Run app with 'npm start' which will run 'node server.js'
-CMD ["npm", "start"]
+# copy artifact build from the 'build environment'
+COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Run the container as an unprivileged user 'node' wherever possible
-USER node
+# expose port 80
+EXPOSE 80
+
+# run nginx
+CMD ["nginx", "-g", "daemon off;"]

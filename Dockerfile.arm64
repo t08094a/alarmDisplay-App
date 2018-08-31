@@ -1,34 +1,33 @@
-FROM arm64v8/node:alpine
+#########################
+### build environment ###
+#########################
 
-# create app directory
+
+FROM arm64v8/node:alpine as builder
+
 WORKDIR /app
 
-# install simple monitor script for use during development of a node.js app
-#RUN npm install -g nodemon
+# install and cache app dependencies
+COPY package*.json /app/
+RUN yarn install
 
-# install app dependencies
-# a wildcard is used to ensure both package.json and package-lock.json are copied where available (npm@5+)
-ADD package*.json ./
+# copy sources to app directory
+COPY . /app
 
-#RUN npm config set registry http://registry.npmjs.org
+# build the angular app in production mode and store the artifacts in dist folder
+RUN yarn build
 
-RUN npm install && npm ls
-# if buidling code or production:
-#RUN npm install --only=production && npm ls
 
-#RUN mv /app/node_modules /node_modules
+##################
+### production ###
+##################
+FROM arm64v8/nginx
 
-#ADD . /app
+# copy artifact build from the 'build environment'
+COPY --from=builder /app/dist /usr/share/nginx/html
 
-# bundle app source
-COPY . .
+# expose port 80
+EXPOSE 80
 
-#ENV PORT 80
-EXPOSE 8080
-
-#ENV NODE_ENV=production
-
-#CMD ["node", "index.js"]
-CMD [ "npm", "start" ]
-
-USER node
+# run nginx
+CMD ["nginx", "-g", "daemon off;"]
