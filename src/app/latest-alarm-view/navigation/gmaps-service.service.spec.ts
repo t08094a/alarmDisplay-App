@@ -1,15 +1,15 @@
 import { TestBed, inject } from '@angular/core/testing';
 
-import { GmapsServiceService } from './gmaps-service.service';
+import { GMapsService } from './gmaps-service.service';
 
 describe('GmapsServiceService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [GmapsServiceService]
+      providers: [GMapsService]
     });
   });
 
-  it('should be created', inject([GmapsServiceService], (service: GmapsServiceService) => {
+  it('should be created', inject([GMapsService], (service: GMapsService) => {
     expect(service).toBeTruthy();
   }));
 });
