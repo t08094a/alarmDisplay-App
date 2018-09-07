@@ -8,7 +8,7 @@ FROM node:alpine as builder
 WORKDIR /app
 
 # install and cache app dependencies
-COPY package*.json /app/
+COPY package.json yarn.lock /app/
 RUN yarn install
 
 # copy sources to app directory
