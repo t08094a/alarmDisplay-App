@@ -8,15 +8,12 @@ FROM arm64v8/node:alpine as builder
 WORKDIR /app
 
 # Install yarn
-#RUN mkdir -p /opt && cd /opt \
-#    wget https://yarnpkg.com/latest.tar.gz && \
-
-
+RUN apk add yarn
 
 # install and cache app dependencies
 COPY package*.json /app/
 
-RUN yarn -v
+RUN yarn --version
 RUN yarn install
 
 # copy sources to app directory
