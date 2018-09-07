@@ -3,7 +3,7 @@
 #########################
 
 
-FROM arm64v8/node:alpine as builder
+FROM arm64v8/node:slim as builder
 
 WORKDIR /app
 
