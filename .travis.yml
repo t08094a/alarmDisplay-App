@@ -25,27 +25,27 @@ script:
   #- yarn test
   - yarn build
   # prepare qemu
-  - docker run --rm --privileged multiarch/qemu-user-static:register --reset
+  #- docker run --rm --privileged multiarch/qemu-user-static:register --reset
   # get qemu-arm-static binary
-  - mkdir tmp
-  - >
-    pushd tmp &&
-    curl -L -o qemu-arm-static.tar.gz https://github.com/multiarch/qemu-user-static/releases/download/v2.6.0/qemu-arm-static.tar.gz &&
-    tar xzf qemu-arm-static.tar.gz &&
-    popd
+  #- mkdir tmp
+  #- >
+  #  pushd tmp &&
+  #  curl -L -o qemu-arm-static.tar.gz https://github.com/multiarch/qemu-user-static/releases/download/v2.6.0/qemu-arm-static.tar.gz &&
+  #  tar xzf qemu-arm-static.tar.gz &&
+  #  popd
   # build image
-  - docker build -t t08094a/rpi-armv7-alarmdisplay-app:build -f ./Dockerfile.armv7 .
+  #- docker build -t t08094a/rpi-armv7-alarmdisplay-app:build -f ./Dockerfile.armv7 .
   # test image
-  - docker run t08094a/rpi-armv7-alarmdisplay-app:build uname -a
+  #- docker run t08094a/rpi-armv7-alarmdisplay-app:build uname -a
   # push image
   - >
     if [ "$TRAVIS_BRANCH" == "master" ] && [[ $TRAVIS_PULL_REQUEST == "false" ]]; then
       docker login -u="$DOCKER_USER" -p="$DOCKER_PASS"
-      TAG=$(grep "FROM " Dockerfile.armv7 | sed 's/.*://')
-      docker tag t08094a/rpi-armv7-alarmdisplay-app:build t08094a/rpi-armv7-alarmdisplay-app:$TAG
-      docker tag t08094a/rpi-armv7-alarmdisplay-app:build t08094a/rpi-armv7-alarmdisplay-app:latest
-      docker push t08094a/rpi-armv7-alarmdisplay-app:$TAG
-      docker push t08094a/rpi-armv7-alarmdisplay-app:latest
+      TAG=$(grep "FROM " Dockerfile | sed 's/.*://')
+      docker tag t08094a/alarmdisplay-app:build t08094a/alarmdisplay-app:$TAG
+      docker tag t08094a/alarmdisplay-app:build t08094a/alarmdisplay-app:latest
+      docker push t08094a/alarmdisplay-app:$TAG
+      docker push t08094a/alarmdisplay-app:latest
     fi
 notifications:
   webhooks:
