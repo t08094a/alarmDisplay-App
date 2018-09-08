@@ -34,18 +34,18 @@ script:
     tar xzf qemu-arm-static.tar.gz &&
     popd
   # build image
-  - docker build -t t08094a/rpi-alarmdisplay-app:build -f ./Dockerfile.arm64 .
+  - docker build -t t08094a/rpi-armv7-alarmdisplay-app:build -f ./Dockerfile.armv7 .
   # test image
-  - docker run t08094a/rpi-alarmdisplay-app:build uname -a
+  - docker run t08094a/rpi-armv7-alarmdisplay-app:build uname -a
   # push image
   - >
     if [ "$TRAVIS_BRANCH" == "master" ] && [[ $TRAVIS_PULL_REQUEST == "false" ]]; then
       docker login -u="$DOCKER_USER" -p="$DOCKER_PASS"
-      TAG=$(grep "FROM " Dockerfile.arm | sed 's/.*://')
-      docker tag t08094a/rpi-alarmdisplay-app:build t08094a/rpi-alarmdisplay-app:$TAG
-      docker tag t08094a/rpi-alarmdisplay-app:build t08094a/rpi-alarmdisplay-app:latest
-      docker push t08094a/rpi-alarmdisplay-app:$TAG
-      docker push t08094a/rpi-alarmdisplay-app:latest
+      TAG=$(grep "FROM " Dockerfile.armv7 | sed 's/.*://')
+      docker tag t08094a/rpi-armv7-alarmdisplay-app:build t08094a/rpi-armv7-alarmdisplay-app:$TAG
+      docker tag t08094a/rpi-armv7-alarmdisplay-app:build t08094a/rpi-armv7-alarmdisplay-app:latest
+      docker push t08094a/rpi-armv7-alarmdisplay-app:$TAG
+      docker push t08094a/rpi-armv7-alarmdisplay-app:latest
     fi
 notifications:
   webhooks:
