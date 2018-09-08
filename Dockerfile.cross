@@ -2,8 +2,9 @@
 ### build environment ###
 #########################
 
-# use latest LTS version
 FROM node:alpine as builder
+ARG ARCH=__BASEIMAGE_ARCH__
+__CROSS_COPY qemu-__QEMU_ARCH__-static /usr/bin/qemu-__QEMU_ARCH__-static
 
 WORKDIR /app
 
@@ -23,11 +24,11 @@ RUN ng config -g cli.packageManager yarn
 # build the angular app in production mode and store the artifacts in dist folder
 RUN yarn build
 
-
 ##################
 ### production ###
 ##################
 FROM nginx:alpine
+ARG ARCH=__BASEIMAGE_ARCH__
 
 # copy artifact build from the 'build environment'
 COPY --from=builder /app/dist /usr/share/nginx/html

@@ -1,52 +1,49 @@
 os:
   - linux
+
 sudo: required
+
 services:
   - docker
-language: node_js
-node_js:
-  - "8.11.3"
+
+language: bash
+
 cache:
   yarn: true
   directories:
     - node
     - node_modules
     - $HOME/.yarn-cache
+
 env:
   global:
-    - NODE_VERSION=8.11.3
+    - VERSION=1.${TRAVIS_BUILD_NUMBER}
+
 before_install:
-  # Repo for Yarn
-  - curl -o- -L https://yarnpkg.com/install.sh | bash -s
-  - export PATH="$HOME/.yarn/bin:$PATH"
-install:
-  - yarn install
+  - wget https://github.com/clnperez/cli/releases/download/1.0/docker-linux-amd64
+  - chmod 755 docker-linux-amd64
+  - docker pull multiarch/qemu-user-static:register
+  - docker run --rm --privileged multiarch/qemu-user-static:register --reset
+  - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+
 script:
-  #- yarn test
-  - yarn build
-  # prepare qemu
-  #- docker run --rm --privileged multiarch/qemu-user-static:register --reset
-  # get qemu-arm-static binary
-  #- mkdir tmp
-  #- >
-  #  pushd tmp &&
-  #  curl -L -o qemu-arm-static.tar.gz https://github.com/multiarch/qemu-user-static/releases/download/v2.6.0/qemu-arm-static.tar.gz &&
-  #  tar xzf qemu-arm-static.tar.gz &&
-  #  popd
-  # build image
-  #- docker build -t t08094a/rpi-armv7-alarmdisplay-app:build -f ./Dockerfile.armv7 .
-  # test image
-  #- docker run t08094a/rpi-armv7-alarmdisplay-app:build uname -a
-  # push image
-  - >
-    if [ "$TRAVIS_BRANCH" == "master" ] && [[ $TRAVIS_PULL_REQUEST == "false" ]]; then
-      docker login -u="$DOCKER_USER" -p="$DOCKER_PASS"
-      TAG=$(grep "FROM " Dockerfile | sed 's/.*://')
-      docker tag t08094a/alarmdisplay-app:build t08094a/alarmdisplay-app:$TAG
-      docker tag t08094a/alarmdisplay-app:build t08094a/alarmdisplay-app:latest
-      docker push t08094a/alarmdisplay-app:$TAG
-      docker push t08094a/alarmdisplay-app:latest
-    fi
+  - make amd64
+  - make arm64v8
+  - make arm32v7
+
+after_success:
+    - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+    - docker push $REPO/$IMAGE_NAME:amd64
+    - docker push $REPO/$IMAGE_NAME:arm64v8
+    - docker push $REPO/$IMAGE_NAME:arm32v7
+    - ./docker-linux-amd64 -v
+    - ./docker-linux-amd64 manifest create $REPO/$IMAGE_NAME:latest $REPO/$IMAGE_NAME:amd64 $REPO/$IMAGE_NAME:arm64v8 $REPO/$IMAGE_NAME:arm32v7 -a
+    - ./docker-linux-amd64 manifest inspect $REPO/$IMAGE_NAME:latest
+    - ./docker-linux-amd64 manifest annotate $REPO/$IMAGE_NAME:latest $REPO/$IMAGE_NAME:amd64
+    - ./docker-linux-amd64 manifest annotate $REPO/$IMAGE_NAME:latest $REPO/$IMAGE_NAME:arm64v8 --os linux --arch arm64 --variant armv8
+    - ./docker-linux-amd64 manifest annotate $REPO/$IMAGE_NAME:latest $REPO/$IMAGE_NAME:arm32v7 --os linux --arch arm
+    - ./docker-linux-amd64 manifest push $REPO/$IMAGE_NAME:latest
+
 notifications:
   webhooks:
     on_success: change  # options: [always|never|change] default: always

@@ -1,5 +1,26 @@
 # AlarmDisplayApp
 
+The web application should be displayed by a kiosk system and gets its alarm informations form project [t08094a/alarmdisplay-dataserver](https://github.com/t08094a/alarmDisplay-DataCenter)
+
+The following architectures are supported:
+* amd64
+* arm64v8
+* arm32v7
+
+## Travis CI
+Define following environment variables:
+* DOCKER_USERNAME
+* DOCKER_PASSWORD
+* IMAGE_NAME
+* REPO
+
+## Generate Dockerfiles
+``
+make amd64   -> Dockerfile.amd64
+make arm64v8 -> Dockerfile.arm64v8
+make arm32v7 -> Dockerfile.arm32v7
+``
+
 ## Development
 
 ### Development server
