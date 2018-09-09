@@ -1,0 +1,8 @@
+{
+    "[makefile]": {
+        "editor.insertSpaces": false
+    },
+    "files.associations": {
+        "Dockerfile*": "dockerfile"
+    }
+}

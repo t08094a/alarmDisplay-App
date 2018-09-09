@@ -1,4 +1,6 @@
 
+SHELL:=/bin/bash
+
 amd64:
 	cp Dockerfile.cross Dockerfile.amd64
 	sed -i "s|__BASEIMAGE_ARCH__|amd64|g" Dockerfile.amd64
