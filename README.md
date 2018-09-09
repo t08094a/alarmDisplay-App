@@ -8,6 +8,8 @@ The following architectures are supported:
 * arm32v7
 
 ## Travis CI
+Current build status: [![Build Status](https://travis-ci.org/t08094a/alarmDisplay-App.svg?branch=master)](https://travis-ci.org/t08094a/alarmDisplay-App)
+
 Define following environment variables:
 * DOCKER_USERNAME
 * DOCKER_PASSWORD
