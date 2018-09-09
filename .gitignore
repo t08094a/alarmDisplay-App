@@ -46,3 +46,10 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+docker-linux-amd64
+
+# Docker
+docker-linux-amd64
+
+# qemu
+/qemu

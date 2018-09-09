@@ -18,7 +18,7 @@ arm64v8:
 		wget https://github.com/multiarch/qemu-user-static/releases/download/v2.12.0/qemu-aarch64-static ; \
 		chmod 755 qemu-aarch64-static ; \
 	fi
-	docker build --build-arg ARCH=arm32v8 --no-cache -f Dockerfile.arm64v8 -t $(REPO)/$(IMAGE_NAME):arm64v8 .
+	docker build --build-arg ARCH=arm64v8 --no-cache -f Dockerfile.arm64v8 -t $(REPO)/$(IMAGE_NAME):arm64v8 .
 	docker push $(REPO)/$(IMAGE_NAME):arm64v8
 
 arm32v7:
