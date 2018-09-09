@@ -2,7 +2,7 @@
 ### build environment ###
 #########################
 
-FROM node:alpine as builder
+FROM __BASEIMAGE_ARCH__/node:alpine as builder
 ARG ARCH=__BASEIMAGE_ARCH__
 __CROSS_COPY qemu-__QEMU_ARCH__-static /usr/bin/qemu-__QEMU_ARCH__-static
 
@@ -27,7 +27,7 @@ RUN yarn build
 ##################
 ### production ###
 ##################
-FROM nginx:alpine
+FROM __BASEIMAGE_ARCH__/nginx:alpine
 ARG ARCH=__BASEIMAGE_ARCH__
 
 # copy artifact build from the 'build environment'

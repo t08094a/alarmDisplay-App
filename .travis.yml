@@ -39,7 +39,7 @@ after_success:
     - ./docker-linux-amd64 -v
     - ./docker-linux-amd64 manifest create $REPO/$IMAGE_NAME:latest $REPO/$IMAGE_NAME:amd64 $REPO/$IMAGE_NAME:arm64v8 $REPO/$IMAGE_NAME:arm32v7 -a
     - ./docker-linux-amd64 manifest inspect $REPO/$IMAGE_NAME:latest
-    - ./docker-linux-amd64 manifest annotate $REPO/$IMAGE_NAME:latest $REPO/$IMAGE_NAME:amd64
+    - ./docker-linux-amd64 manifest annotate $REPO/$IMAGE_NAME:latest $REPO/$IMAGE_NAME:amd64 --os linux --arch amd64
     - ./docker-linux-amd64 manifest annotate $REPO/$IMAGE_NAME:latest $REPO/$IMAGE_NAME:arm64v8 --os linux --arch arm64 --variant armv8
     - ./docker-linux-amd64 manifest annotate $REPO/$IMAGE_NAME:latest $REPO/$IMAGE_NAME:arm32v7 --os linux --arch arm
     - ./docker-linux-amd64 manifest push $REPO/$IMAGE_NAME:latest
