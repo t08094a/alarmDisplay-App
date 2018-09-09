@@ -17,11 +17,11 @@ Define following environment variables:
 * REPO
 
 ## Generate Dockerfiles
-``
+```console
 make amd64   -> Dockerfile.amd64
 make arm64v8 -> Dockerfile.arm64v8
 make arm32v7 -> Dockerfile.arm32v7
-``
+```
 
 ## Development
 
