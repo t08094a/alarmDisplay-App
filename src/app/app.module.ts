@@ -5,7 +5,7 @@ import { NgModule } from '@angular/core';
 import { AgmCoreModule } from '@agm/core';
 import { AgmDirectionModule } from 'agm-direction';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
-import { MatTabsModule, MatGridListModule } from '@angular/material';
+import { MatTabsModule, MatGridListModule, MatCard, MatCardModule } from '@angular/material';
 import { CarouselModule } from 'primeng/components/carousel/carousel';
 
 import { AppComponent } from './app.component';
@@ -44,6 +44,7 @@ import { EventService } from './common-info/termine-view/services/event-service'
         BrowserAnimationsModule,
         MatTabsModule,
         MatGridListModule,
+        MatCardModule,
         CarouselModule
     ],
     providers: [

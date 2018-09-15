@@ -1,5 +1,7 @@
 .map {
-    height: 300px;
+    height: calc(100% - 90px);
+    width: calc(100% - 7px);
+    position: absolute !important;
     padding: 0;
 }
 

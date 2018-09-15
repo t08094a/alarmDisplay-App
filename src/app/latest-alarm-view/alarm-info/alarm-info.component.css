@@ -1,6 +1,9 @@
 mat-grid-tile div {
     position: absolute;
     left: 0px;
+    font-size: 2em;
+    margin-top: 15px;
+    margin-bottom: 15px;
 }
 
 .titleIcon {
