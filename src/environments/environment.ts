@@ -4,8 +4,18 @@
 // The list of which env maps to which file can be found in `.angular-cli.json`.
 
 export const environment = {
-  production: false,
-  googleMapsKey: 'AIzaSyCxA9zyYW8cK3Ys4HpG_xIP3V3HxQ-3msQ',
-  applicationTitle: 'Feuerwehr Alarm Info Display',
-  VERSION: require('../../package.json').version
+    production: false,
+    googleMapsKey: 'AIzaSyCxA9zyYW8cK3Ys4HpG_xIP3V3HxQ-3msQ',
+    applicationTitle: 'Feuerwehr Alarm Info Display',
+    dataserver: {
+        url: 'http://localhost',
+        port: '9001',
+        restApi: {
+            currentAlarmInfo: '/current-alarm-info'
+        },
+        websocket: {
+            alarmInfoEventKey: 'alarm-info'
+        }
+    },
+    VERSION: require('../../package.json').version
 };

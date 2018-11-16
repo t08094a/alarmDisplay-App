@@ -29,6 +29,9 @@ environment.ts
 !.vscode/launch.json
 !.vscode/extensions.json
 
+# Debug
+/remote-profile
+
 # misc
 /.sass-cache
 /connect.lock
