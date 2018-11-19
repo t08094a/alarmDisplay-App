@@ -62,7 +62,7 @@ export class HydrantplanComponent implements OnDestroy {
 
     options: MapOptions = {
         layers: [this.openStreetMap, this.ziel, this.radiusCircle],
-        zoom: 15,
+        zoom: this.zoomLevel,
         center: latLng([environment.navigationStartPoint.lat, environment.navigationStartPoint.lng]),
         zoomControl: null
     };

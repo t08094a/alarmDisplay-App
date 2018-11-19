@@ -5,7 +5,7 @@ import { Socket } from 'ngx-socket-io';
 
 import { environment } from './../../../../environments/environment';
 import { AlarmInfo } from './../models/alarm-info.model';
-import { takeUntil, map } from 'rxjs/operators';
+import { takeUntil } from 'rxjs/operators';
 import { GeoTransformatorService } from './geo-transformator.service';
 
 @Injectable({providedIn: 'root'})
@@ -62,17 +62,21 @@ export class AlarmObserverService implements OnDestroy {
         this.currentAlarmInfoSource.next(alarmInfo);
 
         if (alarmInfo !== null || alarmInfo !== undefined) {
-            // reset after 15 minutes
-            const resetAlarmInfoTimer = timer(900000, 900000);
-            resetAlarmInfoTimer.pipe(takeUntil(this.unsubscribeTimer)).subscribe(t => {
-                this.currentAlarmInfo = null;
-                this.unsubscribeTimer.next();
-
+            // reset after 15 minutes = 900000
+            timer(900000, 900000).pipe(takeUntil(this.unsubscribeTimer)).subscribe(t => {
                 console.log('[AlarmObserverService] timer event occured -> reset current alarm info');
+
+                this.currentAlarmInfo = null;
+                this.currentAlarmInfoSource.next(alarmInfo);
+
+                console.log('[AlarmObserverService] reset timer');
+                this.unsubscribeTimer.next();
             });
         } else {
             // terminate current timers
             this.unsubscribeTimer.next();
+
+            console.log('[AlarmObserverService] reset timer event');
         }
     }
 

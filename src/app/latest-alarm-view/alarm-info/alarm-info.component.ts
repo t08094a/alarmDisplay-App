@@ -50,7 +50,7 @@ export class AlarmInfoComponent implements OnInit, OnDestroy {
         this.alarmInfo = value;
 
         // update Abek information
-        if ((value != null || value !== undefined) && value.keywords && value.keywords.keyword) {
+        if (value && value.keywords && value.keywords.keyword) {
             console.log('[AlarmInfoComponent] query Abek for current alarm info');
 
             this.abekService

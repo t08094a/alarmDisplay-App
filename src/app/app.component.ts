@@ -24,15 +24,28 @@ export class AppComponent implements OnDestroy {
 
         this.alarmInfoSubscription = alarmObserver.alarmInfoAnnounced$.subscribe(alarmInfo => {
             if (alarmInfo) {
-                console.log('[AppComponent] received new alarm info -> start routing to alarm page');
+                console.log('[AppComponent] received new alarm info');
 
-                // route to alarm info page
-                this.router.navigateByUrl('alarm-info');
+                this.navigateTo('alarm-info');
+            } else {
+                console.log('[AppComponent] received no alarm info');
+                this.navigateTo('common-info');
             }
         });
+
+        if (alarmObserver.currentAlarmInfo) {
+            console.log('[AppComponent] current alarm already present');
+
+            this.navigateTo('alarm-info');
+        }
     }
 
     ngOnDestroy(): void {
         this.alarmInfoSubscription.unsubscribe();
+    }
+
+    private navigateTo(page: string) {
+        console.log(`[AppComponent] navigate to ${page}`);
+        this.router.navigateByUrl(page);
     }
 }
