@@ -1,32 +1,19 @@
-import { Component, OnInit } from '@angular/core';
-import {
-    icon,
-    latLng,
-    Map,
-    marker,
-    point,
-    polyline,
-    tileLayer,
-    TileLayer,
-    LeafletEvent,
-    LeafletMouseEvent,
-    Popup,
-    Layer,
-    Marker,
-    LayerGroup,
-    circle,
-    layerGroup,
-    MapOptions
-} from 'leaflet';
+import { AlarmInfo } from './../alarm-info/models/alarm-info.model';
+import { Component, OnDestroy } from '@angular/core';
+// tslint:disable-next-line:max-line-length
+import { icon, latLng, Map, marker, tileLayer, TileLayer, LeafletMouseEvent, Marker, LayerGroup, circle, MapOptions, LatLngTuple } from 'leaflet';
 import { OverpassService } from './services/overpass.service';
 import { MarkerCreatorService } from './services/marker-creator.service';
+import { AlarmObserverService } from '../alarm-info/services/alarm-observer.service';
+import { Subscription } from 'rxjs';
+import { environment } from '../../../environments/environment.prod';
 
 @Component({
     selector: 'app-hydrantplan',
     templateUrl: './hydrantplan.component.html',
     styleUrls: ['./hydrantplan.component.css']
 })
-export class HydrantplanComponent implements OnInit {
+export class HydrantplanComponent implements OnDestroy {
     public title = 'Hydrantenplan';
 
     private zoomLevel = 17;
@@ -76,39 +63,88 @@ export class HydrantplanComponent implements OnInit {
     options: MapOptions = {
         layers: [this.openStreetMap, this.ziel, this.radiusCircle],
         zoom: 15,
-        center: latLng([49.526558948981595, 10.483931601047516]),
+        center: latLng([environment.navigationStartPoint.lat, environment.navigationStartPoint.lng]),
         zoomControl: null
     };
 
     private map: Map;
+    private alarmInfoSubscription: Subscription;
 
     constructor(
         private overpassService: OverpassService,
-        private markerCreator: MarkerCreatorService
+        private markerCreator: MarkerCreatorService,
+        private alarmObserver: AlarmObserverService
     ) {}
 
-    ngOnInit() {}
+    ngOnDestroy() {
+        this.alarmInfoSubscription.unsubscribe();
+    }
 
     public onMapReady(map: Map): void {
         this.map = map;
 
-        map.setView(this.ziel.getLatLng(), this.zoomLevel);
+        this.alarmInfoSubscription = this.alarmObserver.alarmInfoAnnounced$.subscribe(data => {
+            let alarmInfo = data;
 
-        this.radiusCircle.setLatLng(this.ziel.getLatLng());
+            if (alarmInfo) {
+                console.log('[HydrantplanComponent] got alarmInfoAnnounced');
+            } else {
+                console.log('[HydrantplanComponent] got alarmInfoAnnounced with no alarm info data, try to use cached one');
+                alarmInfo = this.alarmObserver.currentAlarmInfo;
+            }
 
+            this.updateMap(alarmInfo);
+        },
+        error => {
+            console.error(error);
+
+            this.updateMap(null);
+        },
+        () => {
+            console.log('[HydrantplanComponent] alarmInfoAnnounced completed');
+        });
+
+        console.log('[HydrantplanComponent] initial rendering the current active alarmInfo');
+        this.updateMap(this.alarmObserver.currentAlarmInfo);
+    }
+
+    private updateMap(alarmInfo: AlarmInfo): void {
+        if (this.map === null) {
+            console.warn('[HydrantplanComponent] map not ready to show informations');
+            return;
+        }
+
+        let incomingGeoPosition: LatLngTuple = null;
+
+        if (alarmInfo === null || alarmInfo === undefined ||
+            alarmInfo.placeOfAction === null || alarmInfo.placeOfAction === undefined) {
+            console.log('[HydrantplanComponent] alarm info is not set -> reset marker to home');
+
+            incomingGeoPosition = [Number(environment.navigationStartPoint.lat), Number(environment.navigationStartPoint.lng)];
+        } else {
+            const position = alarmInfo.placeOfAction.geoPosition;
+            incomingGeoPosition = [Number(position.lat), Number(position.lng)];
+        }
+
+        console.log(`[HydrantplanComponent] set destination to: [${incomingGeoPosition[0]}; ${incomingGeoPosition[1]}]`);
+
+        this.ziel.setLatLng(incomingGeoPosition);
+        this.options.center = latLng(incomingGeoPosition);
+
+        this.radiusCircle.setLatLng(incomingGeoPosition);
         this.markerCreator
-            .mapToHydrantMarker(
-                this.overpassService.getHydrantMarkers(map.getBounds())
-            )
+            .mapToHydrantMarker(this.overpassService.getHydrantMarkers(this.map.getBounds()))
             .then(m => {
                 const group = new LayerGroup(m);
-                map.addLayer(group);
+                this.map.addLayer(group);
                 this.layersControl.overlays['Hydranten'] = group;
             })
             .catch(error => console.log(error));
 
-        if (!map.hasEventListeners('click')) {
-            map.addEventListener('click', this.onClick);
+        this.map.setView(incomingGeoPosition, this.options.zoom, this.options);
+
+        if (!this.map.hasEventListeners('click')) {
+            this.map.addEventListener('click', this.onClick);
         }
     }
 

@@ -1,11 +1,12 @@
-import { map } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { Injectable, OnDestroy } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { Subject, timer } from 'rxjs';
 import { Socket } from 'ngx-socket-io';
 
 import { environment } from './../../../../environments/environment';
-import { AlarmInfo } from '../models/alarm-info.model';
+import { AlarmInfo } from './../models/alarm-info.model';
+import { takeUntil, map } from 'rxjs/operators';
+import { GeoTransformatorService } from './geo-transformator.service';
 
 @Injectable({providedIn: 'root'})
 export class AlarmObserverService implements OnDestroy {
@@ -13,13 +14,16 @@ export class AlarmObserverService implements OnDestroy {
     private apiCurrentAlarmInfo: string;
     private eventKey: string;
     private currentAlarmInfoSource: Subject<AlarmInfo> = new Subject<AlarmInfo>();
+    private unsubscribeTimer = new Subject();
+    public currentAlarmInfo: AlarmInfo;
 
     // observable alarm info stream
     public alarmInfoAnnounced$ = this.currentAlarmInfoSource.asObservable();
 
     constructor(
         private httpClient: HttpClient,
-        private socket: Socket
+        private socket: Socket,
+        private geoTransformationService: GeoTransformatorService
     ) {
         this.dataserverUrl = `${environment.dataserver.url}:${environment.dataserver.port}`;
         this.apiCurrentAlarmInfo = `${environment.dataserver.restApi.currentAlarmInfo}`;
@@ -38,23 +42,60 @@ export class AlarmObserverService implements OnDestroy {
             console.log(`[AlarmObserverService] disconnected from socket.io ${this.dataserverUrl}`);
         });
 
-        // this.socket.open();
-
-        // if (!this.socket.connected) {
-        //     console.log(`[AlarmObserverService] connect to socket.io ${this.dataserverUrl}`);
-        //     this.socket.connect();
-        // }
-
         this.getUpdates();
     }
 
     ngOnDestroy(): void {
         this.socket.disconnect();
+
+        this.unsubscribeTimer.next();
+        this.unsubscribeTimer.complete();
     }
 
     // Service message commands
     private announceAlarmInfo(alarmInfo: AlarmInfo): void {
+
+        this.transformGKtoWks84Coordinats(alarmInfo);
+        this.currentAlarmInfo = alarmInfo;
+
+        console.log('[AlarmObserverService] publish the alarm info to internal components');
         this.currentAlarmInfoSource.next(alarmInfo);
+
+        if (alarmInfo !== null || alarmInfo !== undefined) {
+            // reset after 15 minutes
+            const resetAlarmInfoTimer = timer(900000, 900000);
+            resetAlarmInfoTimer.pipe(takeUntil(this.unsubscribeTimer)).subscribe(t => {
+                this.currentAlarmInfo = null;
+                this.unsubscribeTimer.next();
+
+                console.log('[AlarmObserverService] timer event occured -> reset current alarm info');
+            });
+        } else {
+            // terminate current timers
+            this.unsubscribeTimer.next();
+        }
+    }
+
+    private transformGKtoWks84Coordinats(alarmInfo: AlarmInfo): void {
+        if (alarmInfo === null || alarmInfo === undefined ||
+            alarmInfo.placeOfAction === null || alarmInfo.placeOfAction === undefined ||
+            alarmInfo.placeOfAction.geoPosition === null || alarmInfo.placeOfAction.geoPosition === undefined) {
+            return;
+        }
+
+        const incomingGeoPosition = alarmInfo.placeOfAction.geoPosition;
+
+        // get lat lng based on given Gauß Krüger coordinates
+        const east = incomingGeoPosition.x;
+        const north = incomingGeoPosition.y;
+
+        const wgs84Position = this.geoTransformationService.transformGaussKruegerToWsg84(east, north);
+
+        // tslint:disable-next-line:max-line-length
+        console.log(`[AlarmObserverService] transformed GK [east: ${east}; north: ${north}] to WGS84: [lat: ${wgs84Position.lat}; lng: ${wgs84Position.lng}]`);
+
+        alarmInfo.placeOfAction.geoPosition.lat = wgs84Position.lat;
+        alarmInfo.placeOfAction.geoPosition.lng = wgs84Position.lng;
     }
 
     /**
@@ -82,10 +123,12 @@ export class AlarmObserverService implements OnDestroy {
     private getUpdates(): void {
         console.log('[AlarmObserverService] get alarm info updates');
 
-        this.socket.fromEvent<AlarmInfo>(this.eventKey).subscribe(data => {
+        this.socket.fromEvent<string>(this.eventKey).subscribe(data => {
             console.log(`[AlarmObserverService] received "${this.eventKey}" from Websocket Server:\n${data}`);
 
-            this.updateCurrentAlarmInfo(data);
+            const alarmInfo: AlarmInfo = JSON.parse(data);
+
+            this.updateCurrentAlarmInfo(alarmInfo);
         },
         error => {
             console.error(error);
@@ -113,16 +156,11 @@ export class AlarmObserverService implements OnDestroy {
             currentAlarmInfoTmp = value;
         }
 
-        if (currentAlarmInfoTmp) {
-            console.log('[AlarmObserverService] incomming alarm info:', currentAlarmInfoTmp);
-
-            if (currentAlarmInfoTmp.placeOfAction) {
-
-                // tslint:disable-next-line:max-line-length
-                let combinedAddress = `${currentAlarmInfoTmp.placeOfAction.street} ${currentAlarmInfoTmp.placeOfAction.houseNumber} ${currentAlarmInfoTmp.placeOfAction.addition}, ${currentAlarmInfoTmp.placeOfAction.city}`;
-                combinedAddress = combinedAddress.trim().replace(/\s+/g, ' ');
-                currentAlarmInfoTmp.placeOfAction.adressAsCombinedString = combinedAddress;
-            }
+        if (currentAlarmInfoTmp && currentAlarmInfoTmp.placeOfAction) {
+            // tslint:disable-next-line:max-line-length
+            let combinedAddress = `${currentAlarmInfoTmp.placeOfAction.street} ${currentAlarmInfoTmp.placeOfAction.houseNumber} ${currentAlarmInfoTmp.placeOfAction.addition}, ${currentAlarmInfoTmp.placeOfAction.city}`;
+            combinedAddress = combinedAddress.trim().replace(/\s+/g, ' ');
+            currentAlarmInfoTmp.placeOfAction.adressAsCombinedString = combinedAddress;
         }
 
         this.announceAlarmInfo(currentAlarmInfoTmp);

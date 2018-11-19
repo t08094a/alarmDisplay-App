@@ -7,7 +7,6 @@ import { AlarmObserverService } from '../alarm-info/services/alarm-observer.serv
 import { Subscription } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { PlaceOfAction } from '../alarm-info/models/placeOfAction.model';
-import { GeoTransformatorService } from './../alarm-info/services/geo-transformator.service';
 import { AlarmInfo } from './../alarm-info/models/alarm-info.model';
 
 @Component({
@@ -23,28 +22,29 @@ export class NavigationComponent implements OnInit, OnDestroy {
     public startLocation = environment.navigationStartPoint;
 
     private origin = environment.navigationStartPoint;
-    private address = 'Am Schießwasen 2, 91438 Bad Windsheim';
     private alarmInfoSubscription: Subscription;
 
     constructor(
         private mapsAPILoader: MapsAPILoader,
         private gMapsService: GMapsService,
         private __zone: NgZone,
-        private alarmObserverService: AlarmObserverService,
-        private geoTransformationService: GeoTransformatorService
+        private alarmObserver: AlarmObserverService
     ) {}
 
     ngOnInit() {
         // load places autocomplete
         this.mapsAPILoader.load().then(() => {
-            this.renderDirections(null);
-        });
+            this.alarmInfoSubscription = this.alarmObserver.alarmInfoAnnounced$.subscribe(data => {
+                let alarmInfo = data;
 
-        this.alarmInfoSubscription = this.alarmObserverService.alarmInfoAnnounced$.subscribe(
-            data => {
-                console.log('[NavigationComponent] got alarmInfoAnnounced');
+                if (alarmInfo) {
+                    console.log('[NavigationComponent] got alarmInfoAnnounced');
+                } else {
+                    console.log('[NavigationComponent] got alarmInfoAnnounced with no alarm info data');
+                    alarmInfo = this.alarmObserver.currentAlarmInfo;
+                }
 
-                this.renderDirections(data);
+                this.renderDirections(alarmInfo);
             },
             error => {
                 console.error(error);
@@ -53,8 +53,12 @@ export class NavigationComponent implements OnInit, OnDestroy {
             },
             () => {
                 console.log('[NavigationComponent] alarmInfoAnnounced completed');
-            }
-        );
+            });
+
+            // tslint:disable-next-line:max-line-length
+            console.log('[NavigationComponent] initial rendering the current active alarmInfo');
+            this.renderDirections(this.alarmObserver.currentAlarmInfo);
+        });
     }
 
     ngOnDestroy(): void {
@@ -65,29 +69,23 @@ export class NavigationComponent implements OnInit, OnDestroy {
         this.renderDirections(null);
     }
 
-    renderDirections(alarmInfo: AlarmInfo) {
+    private renderDirections(alarmInfo: AlarmInfo) {
         if (alarmInfo === null || alarmInfo === undefined ||
-            alarmInfo.placeOfAction === null && alarmInfo.placeOfAction === undefined) {
+            alarmInfo.placeOfAction === null || alarmInfo.placeOfAction === undefined) {
 
             this.dir = null;
 
             return;
         }
 
-        const incomingGeoPosition = alarmInfo.placeOfAction.geoPosition;
+        const incomingWgs84Position = alarmInfo.placeOfAction.geoPosition;
 
-        if (incomingGeoPosition !== null && incomingGeoPosition !== undefined) {
-            // get lat lng based on given Gauß Krüger coordinates
-            const east = incomingGeoPosition.x;
-            const north = incomingGeoPosition.y;
-
-            const wgs84Position = this.geoTransformationService.transformGaussKruegerToWsg84(east, north);
-
-            console.log(`[NavigationComponent] route to LatLng: ${wgs84Position}`);
+        if (incomingWgs84Position !== null && incomingWgs84Position !== undefined) {
+            console.log(`[NavigationComponent] route to lat: ${incomingWgs84Position.lat}; lng: ${incomingWgs84Position.lng}`);
 
             this.dir = {
                 origin: this.origin,
-                destination: wgs84Position,
+                destination: incomingWgs84Position,
                 travelMode: google.maps.TravelMode.DRIVING
             };
         } else {

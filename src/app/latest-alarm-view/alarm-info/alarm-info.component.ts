@@ -34,6 +34,10 @@ export class AlarmInfoComponent implements OnInit, OnDestroy {
                 console.log('[AlarmInfoComponent] got current alarm info completed');
             }
         );
+
+        // tslint:disable-next-line:max-line-length
+        console.log('[AlarmInfoComponent] initial display current active alarmInfo');
+        this.updateCurrentAlarmInfo(this.alarmObserverService.currentAlarmInfo);
     }
 
     ngOnDestroy(): void {

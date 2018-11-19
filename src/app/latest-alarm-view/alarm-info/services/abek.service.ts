@@ -74,7 +74,7 @@ export class AbekService {
                 });
 
                 if (found) {
-                    console.warn('[ABekService] ABek item found:', found);
+                    console.log('[ABekService] ABek item found:', found);
                     resolve(found);
                 } else {
                     console.warn('[ABekService] ABek item not found!');
