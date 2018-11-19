@@ -1,8 +1,8 @@
-import { map } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 import { AbekService } from './services/abek.service';
-import { AlarmContent } from './alarm-content';
-import { Component, OnInit } from '@angular/core';
-import { AlarmItem } from './services/alarm-item';
+import { AlarmInfo } from './models/alarm-info.model';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { AbekItem } from './models/abek-item.model';
 import { AlarmObserverService } from './services/alarm-observer.service';
 
 @Component({
@@ -10,9 +10,10 @@ import { AlarmObserverService } from './services/alarm-observer.service';
     templateUrl: './alarm-info.component.html',
     styleUrls: ['./alarm-info.component.css']
 })
-export class AlarmInfoComponent implements OnInit {
-    public alarmInfo: AlarmContent;
-    public abekInfo: AlarmItem;
+export class AlarmInfoComponent implements OnInit, OnDestroy {
+    private alarmInfoSubscription: Subscription;
+    public alarmInfo: AlarmInfo;
+    public abekInfo: AbekItem;
 
     constructor(
         private abekService: AbekService,
@@ -20,44 +21,46 @@ export class AlarmInfoComponent implements OnInit {
     ) {}
 
     ngOnInit() {
-        // this.alarmInfo = {
-        //     Alarmzeit: new Date(2018, 4, 4, 15, 33, 27),
-        //     Einsatzort: 'Am Kuhwasen 2, 91472 Ipsheim',
-        //     Schlagwort: '#B1710#Meldeanlage#Brandmeldeanlage',
-        //     Prioritaet: 1,
-        //     Bemerkung: '51236122-03: 5.1.3 NEA Camp'
-        // };
+        this.alarmInfoSubscription = this.alarmObserverService.alarmInfoAnnounced$.subscribe(
+            data => {
+                console.log('[AlarmInfoComponent] got current alarm info initial alarm info response');
 
-        this.alarmObserverService.getInitialAlarmInfo().subscribe(
-            this.updateCurrentAlarmInfo(),
+                this.updateCurrentAlarmInfo(data);
+            },
             error => {
                 console.error(error);
             },
             () => {
-                console.log('query initial alarm info complete');
-            }
-        );
-
-        this.alarmObserverService.getUpdates().subscribe(
-            this.updateCurrentAlarmInfo(),
-            error => {
-                console.error(error);
-            },
-            () => {
-                console.log('query update alarm info complete');
+                console.log('[AlarmInfoComponent] got current alarm info completed');
             }
         );
     }
 
-    private updateCurrentAlarmInfo(): (value: AlarmItem) => void {
-        return alarmInfo => {
-            this.alarmInfo = alarmInfo;
+    ngOnDestroy(): void {
+        this.alarmInfoSubscription.unsubscribe();
+    }
+
+    private updateCurrentAlarmInfo(value: AlarmInfo) {
+        console.log('[AlarmInfoComponent] incomming alarm info:', value);
+
+        this.alarmInfo = value;
+
+        // update Abek information
+        if ((value != null || value !== undefined) && value.keywords && value.keywords.keyword) {
+            console.log('[AlarmInfoComponent] query Abek for current alarm info');
+
             this.abekService
-                .getAlarmItem(alarmInfo.Schlagwort)
+                .getAbekItem(value.keywords.keyword)
                 .then(data => {
+                    console.log('[AlarmInfoComponent] response from Abek service:', data);
                     this.abekInfo = data;
                 })
-                .catch(error => console.error(error));
-        };
+                .catch(error => {
+                    console.warn(error);
+                    this.abekInfo = null;
+                });
+        } else {
+            this.abekInfo = null;
+        }
     }
 }

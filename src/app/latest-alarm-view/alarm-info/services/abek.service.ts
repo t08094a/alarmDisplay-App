@@ -1,21 +1,23 @@
 import { Observable, ReplaySubject } from 'rxjs/';
-import { AlarmItem } from './alarm-item';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { AbekItem } from '../models/abek-item.model';
 
 @Injectable()
 export class AbekService {
 
+    private regexp = new RegExp('#([A-Z]+)([0-9]{2})([0-9]{2})#');
     private dataUrl = '../../../../assets/abek_2016.json';
-    private data: Array<AlarmItem> = null;
+    private data: Array<AbekItem> = null;
 
     constructor(private httpClient: HttpClient) {}
 
     private extractAbekKey(bemerkung: string): ABekKey {
-        const regexp = new RegExp('#([A-Z]+)([0-9]{2})([0-9]{2})#');
-        const match = regexp.exec(bemerkung);
+        console.log(`[ABekService] try to extract ABek Key from \"${bemerkung}\"`);
 
         try {
+            const match = this.regexp.exec(bemerkung);
+
             if (match) {
                 const found = match[0];
                 const prefix = match[1];
@@ -24,43 +26,45 @@ export class AbekService {
                 const hauptgruppeNr: number = parseInt(hauptgruppe, 10);
                 const untergruppeNr: number = parseInt(untergruppe, 10);
 
-                console.log(`extracted ABek Key \"${found}\"`);
+                console.log(`[ABekService] extracted ABek Key \"${found}\"`);
 
                 return new ABekKeyImpl(prefix, hauptgruppeNr, untergruppeNr);
             } else {
-                console.warn(`unable to extract ABek Key from \"${bemerkung}\"`);
+                console.warn(`[ABekService] unable to extract ABek Key from \"${bemerkung}\", use empty one`);
                 return new ABekKeyImpl('', 0, 0);
             }
         } catch {
-            console.error(`unable to extract ABek Key from \"${bemerkung}\"`);
+            console.warn(`[ABekService] unable to extract ABek Key from \"${bemerkung}\", use empty one`);
             return new ABekKeyImpl('', 0, 0);
         }
     }
 
-    private readAllAlarmItems(): Promise<AlarmItem[]> {
+    private readAllAbekItems(): Promise<AbekItem[]> {
         if (this.data != null) {
             return new Promise(resolve => {
                 resolve(this.data);
             });
         }
 
-        return this.httpClient.get<AlarmItem[]>(this.dataUrl)
+        return this.httpClient.get<AbekItem[]>(this.dataUrl)
                               .toPromise()
                               .then(data => Promise.resolve(data['data']));
     }
 
-    public getAlarmItem(bemerkung: string): Promise<AlarmItem> {
+    public getAbekItem(bemerkung: string): Promise<AbekItem> {
 
         return new Promise(resolve => {
-            this.readAllAlarmItems().then(result => {
-                console.log('AlarmItems loaded ...');
+            this.readAllAbekItems().then(result => {
+                console.log('[ABekService] AbekItem loaded ...');
 
                 this.data = result;
 
                 const abekKey = this.extractAbekKey(bemerkung);
 
                 if (abekKey.IsEmpty) {
-                    return Promise.reject('Unable to parse ABekKey');
+                    console.warn('[ABekService] unable to parse ABekKey');
+                    resolve(null);
+                    return;
                 }
 
                 const found = this.data.find(item => {
@@ -70,9 +74,11 @@ export class AbekService {
                 });
 
                 if (found) {
+                    console.warn('[ABekService] ABek item found:', found);
                     resolve(found);
                 } else {
-                    return Promise.reject('ABek item not found!');
+                    console.warn('[ABekService] ABek item not found!');
+                    resolve(null);
                 }
             });
         });

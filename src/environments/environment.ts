@@ -14,8 +14,13 @@ export const environment = {
             currentAlarmInfo: '/current-alarm-info'
         },
         websocket: {
-            alarmInfoEventKey: 'alarm-info'
+            alarmInfoEventKey: 'ws-alarm-info'
         }
+    },
+    // e.g. Feuerwehr Gerätehaus
+    navigationStartPoint: {
+        lat: 49.526558948981595,
+        lng: 10.483931601047516
     },
     VERSION: require('../../package.json').version
 };

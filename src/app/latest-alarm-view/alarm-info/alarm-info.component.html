@@ -5,26 +5,26 @@
 
 <mat-grid-list *ngIf="alarmInfo" cols="2" rowHeight="70px" role="list">
     <mat-grid-tile style.background="lightblue" role="listitem">
-        <div *ngIf="alarmInfo.Alarmzeit">
-            <u>Alarmzeit:</u> {{alarmInfo.Alarmzeit | date: 'HH:mm'}} Uhr
+        <div *ngIf="alarmInfo.time">
+            <u>Alarmzeit:</u> {{alarmInfo.time | date: 'HH:mm'}} Uhr
         </div>
     </mat-grid-tile>
 
     <mat-grid-tile style.background="lightgreen" role="listitem">
-        <div *ngIf="alarmInfo.Einsatzort">
-            <u>Einsatzort:</u> {{alarmInfo.Einsatzort}}
+        <div *ngIf="alarmInfo.placeOfAction">
+            <u>Einsatzort:</u> {{alarmInfo.placeOfAction.adressAsCombinedString}}
         </div>
     </mat-grid-tile>
 
     <mat-grid-tile style.background="lightpink" role="listitem">
-        <div *ngIf="alarmInfo.Prioritaet">
-            <u>Priorität:</u> {{alarmInfo.Prioritaet}}
+        <div *ngIf="alarmInfo.priority">
+            <u>Priorität:</u> {{alarmInfo.priority}}
         </div>
     </mat-grid-tile>
 
     <mat-grid-tile style.background="lightblue" role="listitem">
-        <div *ngIf="alarmInfo.Bemerkung">
-            <u>Bemerkung:</u> {{alarmInfo.Bemerkung}}
+        <div *ngIf="alarmInfo.comment">
+            <u>Bemerkung:</u> {{alarmInfo.comment}}
         </div>
     </mat-grid-tile>
 

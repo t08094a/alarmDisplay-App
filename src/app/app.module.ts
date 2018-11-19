@@ -5,10 +5,11 @@ import { NgModule } from '@angular/core';
 import { AgmCoreModule } from '@agm/core';
 import { AgmDirectionModule } from 'agm-direction';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
-import { MatTabsModule, MatGridListModule, MatCard, MatCardModule } from '@angular/material';
+import { MatTabsModule, MatGridListModule, MatCardModule } from '@angular/material';
 import { CarouselModule } from 'primeng/components/carousel/carousel';
 
 import { AppComponent } from './app.component';
+import { AppRoutingModule } from './app.routing.module';
 import { AlarmInfoComponent } from './latest-alarm-view/alarm-info/alarm-info.component';
 import { AbekService } from './latest-alarm-view/alarm-info/services/abek.service';
 import { HydrantplanComponent } from './latest-alarm-view/hydrantplan/hydrantplan.component';
@@ -36,6 +37,7 @@ import { EventService } from './common-info/termine-view/services/event-service'
     imports: [
         BrowserModule,
         HttpClientModule,
+        AppRoutingModule,
         AgmCoreModule.forRoot({
             apiKey: environment.googleMapsKey
         }),

@@ -1,4 +1,4 @@
-export interface AlarmItem {
+export interface AbekItem {
     readonly Nr: number;
     readonly Prefix: string;
     readonly Hauptgruppe: number;
