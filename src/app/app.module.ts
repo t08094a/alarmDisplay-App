@@ -7,6 +7,7 @@ import { AgmDirectionModule } from 'agm-direction';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { MatTabsModule, MatGridListModule, MatCardModule } from '@angular/material';
 import { CarouselModule } from 'primeng/components/carousel/carousel';
+import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app.routing.module';
@@ -23,6 +24,9 @@ import { InfoViewComponent } from './common-info/info-view/info-view.component';
 import { TermineViewComponent } from './common-info/termine-view/termine-view.component';
 import { EventService } from './common-info/termine-view/services/event-service';
 
+
+const config: SocketIoConfig = { url: `${environment.dataserver.url}:${environment.dataserver.port}`, options: {} };
+
 @NgModule({
     declarations: [
         AppComponent,
@@ -38,6 +42,7 @@ import { EventService } from './common-info/termine-view/services/event-service'
         BrowserModule,
         HttpClientModule,
         AppRoutingModule,
+        SocketIoModule.forRoot(config),
         AgmCoreModule.forRoot({
             apiKey: environment.googleMapsKey
         }),

@@ -1,7 +1,8 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { map } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
 import { Injectable, OnDestroy } from '@angular/core';
-import { Observable, Subject, from } from 'rxjs';
-import * as socketio from 'socket.io-client';
+import { Observable, Subject } from 'rxjs';
+import { Socket } from 'ngx-socket-io';
 
 import { environment } from './../../../../environments/environment';
 import { AlarmInfo } from '../models/alarm-info.model';
@@ -11,14 +12,14 @@ export class AlarmObserverService implements OnDestroy {
     private dataserverUrl: string;
     private apiCurrentAlarmInfo: string;
     private eventKey: string;
-    private socket: SocketIOClient.Socket;
     private currentAlarmInfoSource: Subject<AlarmInfo> = new Subject<AlarmInfo>();
 
     // observable alarm info stream
     public alarmInfoAnnounced$ = this.currentAlarmInfoSource.asObservable();
 
     constructor(
-        private httpClient: HttpClient
+        private httpClient: HttpClient,
+        private socket: Socket
     ) {
         this.dataserverUrl = `${environment.dataserver.url}:${environment.dataserver.port}`;
         this.apiCurrentAlarmInfo = `${environment.dataserver.restApi.currentAlarmInfo}`;
@@ -30,12 +31,10 @@ export class AlarmObserverService implements OnDestroy {
     initialize() {
         this.getInitialAlarmInfo();
 
-        this.socket = socketio(this.dataserverUrl);
-
-        this.socket.io.addEventListener('connection', () => {
+        this.socket.ioSocket.addEventListener('connection', () => {
             console.log(`[AlarmObserverService] connected to socket.io ${this.dataserverUrl}`);
         });
-        this.socket.io.addEventListener('disconnect', () => {
+        this.socket.ioSocket.addEventListener('disconnect', () => {
             console.log(`[AlarmObserverService] disconnected from socket.io ${this.dataserverUrl}`);
         });
 
@@ -83,11 +82,16 @@ export class AlarmObserverService implements OnDestroy {
     private getUpdates(): void {
         console.log('[AlarmObserverService] get alarm info updates');
 
-        // We define our observable which will observe any incoming messages from our alarminfo data server.
-        this.socket.io.on(this.eventKey, (data: AlarmInfo) => {
+        this.socket.fromEvent<AlarmInfo>(this.eventKey).subscribe(data => {
             console.log(`[AlarmObserverService] received "${this.eventKey}" from Websocket Server:\n${data}`);
 
             this.updateCurrentAlarmInfo(data);
+        },
+        error => {
+            console.error(error);
+        },
+        () => {
+            console.log('[AlarmObserverService] get updates query completed');
         });
     }
 

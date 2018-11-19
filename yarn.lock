@@ -407,11 +407,6 @@
   resolved "https://registry.yarnpkg.com/@types/selenium-webdriver/-/selenium-webdriver-3.0.13.tgz#deb799c641773c5e367abafc92d1e733d62cddd7"
   integrity sha512-rI0LGoMiZGUM+tjDakQpwZOvcmQoubiJ7hxqrYU12VRxBuGGvOThxrBOU/QmJKlKg1WG6FMzuvcEyLffvVSsmw==
 
-"@types/socket.io-client@^1.4.32":
-  version "1.4.32"
-  resolved "https://registry.yarnpkg.com/@types/socket.io-client/-/socket.io-client-1.4.32.tgz#988a65a0386c274b1c22a55377fab6a30789ac14"
-  integrity sha512-Vs55Kq8F+OWvy1RLA31rT+cAyemzgm0EWNeax6BWF8H7QiiOYMJIdcwSDdm5LVgfEkoepsWkS+40+WNb7BUMbg==
-
 "@webassemblyjs/ast@1.7.6":
   version "1.7.6"
   resolved "https://registry.yarnpkg.com/@webassemblyjs/ast/-/ast-1.7.6.tgz#3ef8c45b3e5e943a153a05281317474fef63e21e"
@@ -1791,7 +1786,7 @@ copy-webpack-plugin@4.5.4:
     p-limit "^1.0.0"
     serialize-javascript "^1.4.0"
 
-core-js@^2.2.0, core-js@^2.4.0, core-js@^2.5.7:
+core-js@^2.2.0, core-js@^2.4.0, core-js@^2.4.1, core-js@^2.5.7:
   version "2.5.7"
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.5.7.tgz#f972608ff0cead68b841a16a932d0b183791814e"
   integrity sha512-RszJCAxg/PP6uzXVXL6BsxSXx/B05oJAQ2vkJRjyjrEcNVycaqOmNb5OTxZPE3xa5gwZduqza6L9JOCenh/Ecw==
@@ -4662,6 +4657,18 @@ neo-async@^2.5.0:
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.0.tgz#b9d15e4d71c6762908654b5183ed38b753340835"
   integrity sha512-MFh0d/Wa7vkKO3Y3LlacqAEeHK0mckVqzDieUKTT+KGxi+zIpeVsFxymkIiRpbpDziHc290Xr9A1O4Om7otoRA==
 
+ngx-socket-io@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/ngx-socket-io/-/ngx-socket-io-2.0.0.tgz#3c1556decd5181f5e2604f221f5d97587eab9def"
+  integrity sha512-pTNCgbEvQ9rtbI8k+OJzOUDUvg/ZU832KkxjOCjuaCQ26ad77gYq494IynuNJZ23gx6KguTKOhlwqrkymF6uHg==
+  dependencies:
+    core-js "^2.4.1"
+    reflect-metadata "^0.1.10"
+    rxjs "^6.1.0"
+    socket.io "^2.0.1"
+    socket.io-client "^2.0.1"
+    zone.js "^0.8.11"
+
 nice-try@^1.0.4:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/nice-try/-/nice-try-1.0.5.tgz#a3378a7696ce7d223e88fc9b764bd7ef1089e366"
@@ -5705,7 +5712,7 @@ redent@^1.0.0:
     indent-string "^2.1.0"
     strip-indent "^1.0.1"
 
-reflect-metadata@^0.1.2:
+reflect-metadata@^0.1.10, reflect-metadata@^0.1.2:
   version "0.1.12"
   resolved "https://registry.yarnpkg.com/reflect-metadata/-/reflect-metadata-0.1.12.tgz#311bf0c6b63cd782f228a81abe146a2bfa9c56f2"
   integrity sha512-n+IyV+nGz3+0q3/Yf1ra12KpCyi001bi4XFxSjbiWWjfqb52iTTtpGXmCCAOWWIAn9KEuFZKGqBERHmrtScZ3A==
@@ -6252,7 +6259,7 @@ socket.io-adapter@~1.1.0:
   resolved "https://registry.yarnpkg.com/socket.io-adapter/-/socket.io-adapter-1.1.1.tgz#2a805e8a14d6372124dd9159ad4502f8cb07f06b"
   integrity sha1-KoBeihTWNyEk3ZFZrUUC+MsH8Gs=
 
-socket.io-client@2.1.1, socket.io-client@^2.1.1:
+socket.io-client@2.1.1, socket.io-client@^2.0.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/socket.io-client/-/socket.io-client-2.1.1.tgz#dcb38103436ab4578ddb026638ae2f21b623671f"
   integrity sha512-jxnFyhAuFxYfjqIgduQlhzqTcOEQSn+OHKVfAxWaNWa7ecP7xSNk2Dx/3UEsDcY7NcFafxvNvKPmmO7HTwTxGQ==
@@ -6281,7 +6288,7 @@ socket.io-parser@~3.2.0:
     debug "~3.1.0"
     isarray "2.0.1"
 
-socket.io@2.1.1:
+socket.io@2.1.1, socket.io@^2.0.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/socket.io/-/socket.io-2.1.1.tgz#a069c5feabee3e6b214a75b40ce0652e1cfb9980"
   integrity sha512-rORqq9c+7W0DAK3cleWNSyfv/qKXV99hV4tZe+gGLfBECw3XEhBy7x85F3wypA9688LKjtwO9pX9L33/xQI8yA==
@@ -7563,7 +7570,7 @@ yn@^2.0.0:
   resolved "https://registry.yarnpkg.com/yn/-/yn-2.0.0.tgz#e5adabc8acf408f6385fc76495684c88e6af689a"
   integrity sha1-5a2ryKz0CPY4X8dklWhMiOavaJo=
 
-zone.js@^0.8.26:
+zone.js@^0.8.11, zone.js@^0.8.26:
   version "0.8.26"
   resolved "https://registry.yarnpkg.com/zone.js/-/zone.js-0.8.26.tgz#7bdd72f7668c5a7ad6b118148b4ea39c59d08d2d"
   integrity sha512-W9Nj+UmBJG251wkCacIkETgra4QgBo/vgoEkb4a2uoLzpQG7qF9nzwoLXWU5xj3Fg2mxGvEDh47mg24vXccYjA==
