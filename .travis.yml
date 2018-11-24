@@ -1,17 +1,18 @@
 os:
   - linux
 
+dist: xenial
+
 sudo: required
 
 services:
   - docker
 
-language: bash
+language: node_js
 
 before_install:
   - sudo apt-get update
-  - sudo apt-get install -y python2.7
-  - sudo ln -s /usr/bin/python2.7 /usr/bin/python2
+  - sudo apt-get dist-upgrade
   - wget https://github.com/clnperez/cli/releases/download/1.0/docker-linux-amd64
   - chmod 755 docker-linux-amd64
 
