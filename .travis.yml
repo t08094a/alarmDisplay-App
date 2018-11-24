@@ -3,6 +3,8 @@ os:
 
 dist: xenial
 
+sudo: required
+
 services:
   - docker
 
