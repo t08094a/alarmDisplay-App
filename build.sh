@@ -32,7 +32,8 @@ case ${build_uname_arch} in
     ;;
 esac
 
-docker_bin_path=$( type -P docker-${build_os}-${build_arch} || type -P ${DOCKER_CLI_PATH%/}/docker-${build_os}-${build_arch} || echo docker-not-found )
+docker_bin_path=$(readlink -f $( type -P docker-${build_os}-${build_arch} || type -P ${DOCKER_CLI_PATH%/}/docker-${build_os}-${build_arch} || echo docker-not-found ))
+echo docker_bin_path: ${docker_bin_path}
 
 if [[ ! -x ${docker_bin_path} ]]; then
   echo ERROR: Missing Docker CLI with manifest command \(docker_bin_path: ${docker_bin_path}\)
@@ -42,6 +43,9 @@ fi
 if [[ -z ${IMAGE_VERSION} ]]; then
   IMAGE_VERSION="latest"
 fi
+
+# Register QEMU in the build agent
+docker run --rm --privileged multiarch/qemu-user-static:register --reset
 
 for docker_arch in ${TARGET_ARCHES}; do
   echo ========  build: ${docker_arch}  ========
@@ -76,6 +80,7 @@ for docker_arch in ${TARGET_ARCHES}; do
   rm Dockerfile.${docker_arch}
 done
 
+echo ""
 echo INFO: Creating fat manifest for ${REPO}/${IMAGE_NAME}:${IMAGE_VERSION}
 echo INFO: with subimages: ${arch_images}
 if [ -d ${HOME}/.docker/manifests/docker.io_${REPO}_${IMAGE_NAME}-${IMAGE_VERSION} ]; then
