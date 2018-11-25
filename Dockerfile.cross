@@ -14,9 +14,9 @@ ENV PATH=${PATH}:./node_modules/@angular/cli/bin/
 # install and cache app dependencies
 COPY ["package.json", "package-lock.json*", "npm-shrinkwrap.json*", "yarn.lock", "/app/"]
 
-RUN apk add python make gcc g++ && \
-    yarn install && \
-    [ -f /app/yarn-error.log ] && cat /app/yarn-error.log
+RUN apk add python make gcc g++
+RUN yarn install
+RUN [ -f /app/yarn-error.log ] && cat /app/yarn-error.log
 
 # copy sources to app directory
 COPY . .
