@@ -14,7 +14,7 @@ ENV PATH=${PATH}:./node_modules/@angular/cli/bin/
 # install and cache app dependencies
 COPY ["package.json", "package-lock.json*", "npm-shrinkwrap.json*", "yarn.lock"]
 
-RUN sudo apt install python && yarn install && yarn add @angular/cli --dev
+RUN apk add python && yarn install && yarn add @angular/cli --dev
 
 # copy sources to app directory
 COPY . .
