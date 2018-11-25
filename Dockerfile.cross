@@ -16,7 +16,7 @@ COPY ["package.json", "package-lock.json*", "npm-shrinkwrap.json*", "yarn.lock",
 
 RUN apk add python make gcc g++
 RUN yarn install
-RUN [ -f /app/yarn-error.log ] && cat /app/yarn-error.log
+#RUN [ -f /app/yarn-error.log ] && cat /app/yarn-error.log
 
 # copy sources to app directory
 COPY . .
