@@ -14,8 +14,6 @@ node_js:
   - "10"
 
 before_install:
-  - export PYTHON=python2.7
-  - npm config set python /usr/bin/python2.7
   - curl -o- -L https://yarnpkg.com/install.sh | bash
   - export PATH="$HOME/.yarn/bin:$PATH"
   - wget https://github.com/clnperez/cli/releases/download/1.0/docker-linux-amd64
