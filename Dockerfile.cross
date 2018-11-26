@@ -14,7 +14,7 @@ ENV PATH=${PATH}:./node_modules/@angular/cli/bin/
 # install and cache app dependencies
 COPY ["package.json", "yarn.lock", "/app/"]
 
-RUN yarn install
+RUN yarn install --verbose
 
 # copy sources to app directory
 COPY . .
@@ -23,7 +23,7 @@ RUN ng config -g cli.packageManager yarn \
     && ng --version
 
 # build the angular app in production mode and store the artifacts in dist folder
-RUN yarn build
+RUN yarn build --verbose
 
 ##################
 ### production ###
