@@ -3,8 +3,8 @@ export const environment = {
     googleMapsKey: 'AIzaSyCxA9zyYW8cK3Ys4HpG_xIP3V3HxQ-3msQ',
     applicationTitle: 'Feuerwehr Alarm Info Display',
     dataserver: {
-        url: 'http://localhost',
-        port: '9001',
+        url: 'http://alarmdisplay-datacenter',
+        port: '9002',
         restApi : {
             currentAlarmInfo: '/current-alarm-info'
         },
