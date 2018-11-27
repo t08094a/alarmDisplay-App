@@ -22,7 +22,7 @@ COPY . .
 # build the angular app in production mode and store the artifacts in dist folder
 RUN ng config -g cli.packageManager yarn \
     && ng --version \
-    && yarn build --prod
+    && yarn build --prod --verbose
 
 
 ##################
