@@ -30,7 +30,13 @@ RUN ng config -g cli.packageManager yarn \
 ##################
 FROM __BASEIMAGE_ARCH__/nginx:__NGINX_TAG__
 
-# copy artifact build from the 'build environment'
+# copy our default nginx config
+COPY nginx/default.conf /etc/nginx/conf.d/
+
+# remove default nginx website
+RUN rm -rf /usr/share/nginx/html/*
+
+# copy artifact build from the 'build stage'
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 # expose port 80
