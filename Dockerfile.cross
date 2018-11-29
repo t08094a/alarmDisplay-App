@@ -20,15 +20,16 @@ RUN yarn install
 COPY . .
 
 # build the angular app in production mode and store the artifacts in dist folder
-RUN ng config -g cli.packageManager yarn \
-    && ng --version \
-    && yarn build --prod --verbose
+RUN ng --version
+RUN yarn build --prod --verbose
 
 
 ##################
 ### production ###
 ##################
 FROM __BASEIMAGE_ARCH__/nginx:__NGINX_TAG__
+
+__CROSS_COPY qemu/qemu-__QEMU_ARCH__-static /usr/bin/qemu-__QEMU_ARCH__-static
 
 # copy our default nginx config
 COPY nginx/default.conf /etc/nginx/conf.d/
