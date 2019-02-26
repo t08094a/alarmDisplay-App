@@ -51,5 +51,5 @@ export class OverpassService {
                 console.log(error);
                 return Promise.reject(error.error);
               });
-  }
+    }
 }

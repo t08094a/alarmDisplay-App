@@ -1,0 +1,22 @@
+// NOTE: #{...} are placeholders that are replaced during deployment
+{
+    "applicationTitle": "#{ADA_APPLICATION_TITLE}",
+    "googleMapsKey": "#{ADA_GOOGLE_MAPS_KEY}",
+    "googleCalendarId": "#{ADA_GOOGLE_CALENDAR_ID}",
+    "navigation": {
+        "startPoint": {
+            "lat": "#{ADA_NAVIGATION_START_POINT_LAT}",
+            "lng": "#{ADA_NAVIGATION_START_POINT_LNG}"
+        }
+    },
+    "dataserver": {
+        "url": "#{ADA_DATASERVER_URL}",
+        "port": "#{ADA_DATASERVER_PORT}",
+        "restResources": {
+            "currentAlarmInfo": "#{ADA_DATASERVER_REST_RESOURCE_CURRENT_ALARM_INFO}"
+        },
+        "websocket": {
+            "alarmInfoEventKey": "#{ADA_DATASERVER_WEBSOCKET_ALARM_INFO_EVENT_KEY}"
+        }
+    }
+}

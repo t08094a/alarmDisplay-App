@@ -1,3 +1,4 @@
+import { APP_INITIALIZER } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -7,7 +8,7 @@ import { AgmDirectionModule } from 'agm-direction';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { MatTabsModule, MatGridListModule, MatCardModule } from '@angular/material';
 import { CarouselModule } from 'primeng/components/carousel/carousel';
-import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
+import { SocketIoModule } from 'ngx-socket-io';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app.routing.module';
@@ -18,14 +19,16 @@ import { CommonInfoComponent } from './common-info/common-info.component';
 import { NavigationComponent } from './latest-alarm-view/navigation/navigation.component';
 import { OverpassService } from './latest-alarm-view/hydrantplan/services/overpass.service';
 import { MarkerCreatorService } from './latest-alarm-view/hydrantplan/services/marker-creator.service';
-import { environment } from '../environments/environment.prod';
 import { LatestAlarmViewComponent } from './latest-alarm-view/latest-alarm-view.component';
 import { InfoViewComponent } from './common-info/info-view/info-view.component';
 import { TermineViewComponent } from './common-info/termine-view/termine-view.component';
 import { EventService } from './common-info/termine-view/services/event-service';
+import { AppConfig } from './services/app-config.service';
+import { SocketLatestAlarmInfo } from './latest-alarm-view/alarm-info/services/socket-latest-alarm-info';
 
-
-const config: SocketIoConfig = { url: `${environment.dataserver.url}:${environment.dataserver.port}`, options: {} };
+export function initializeApp(appConfig: AppConfig) {
+    return () => appConfig.load();
+}
 
 @NgModule({
     declarations: [
@@ -42,10 +45,10 @@ const config: SocketIoConfig = { url: `${environment.dataserver.url}:${environme
         BrowserModule,
         HttpClientModule,
         AppRoutingModule,
-        SocketIoModule.forRoot(config),
-        AgmCoreModule.forRoot({
-            apiKey: environment.googleMapsKey
-        }),
+        SocketIoModule,
+        AgmCoreModule.forRoot(
+            { apiKey: 'NOPE' }
+        ),
         AgmDirectionModule,
         LeafletModule.forRoot(),
         BrowserAnimationsModule,
@@ -55,6 +58,13 @@ const config: SocketIoConfig = { url: `${environment.dataserver.url}:${environme
         CarouselModule
     ],
     providers: [
+        AppConfig,
+        {
+            provide: APP_INITIALIZER,
+            useFactory: initializeApp,
+            deps: [AppConfig], multi: true
+        },
+        SocketLatestAlarmInfo,
         OverpassService,
         MarkerCreatorService,
         EventService,

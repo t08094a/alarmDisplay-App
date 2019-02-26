@@ -1,0 +1,21 @@
+{
+    "applicationTitle": "Feuerwehr Alarm Info Display - Development",
+    "googleMapsKey": "AIzaSyCxA9zyYW8cK3Ys4HpG_xIP3V3HxQ-3msQ",
+    "googleCalendarId": "nba5ul4kfa3q1ukhukqme7q870@group.calendar.google.com",
+    "navigation": {
+        "startPoint": {
+            "lat": 49.526558948981595,
+            "lng": 10.483931601047516
+        }
+    },
+    "dataserver": {
+        "url": "http://localhost",
+        "port": 9002,
+        "restResources": {
+            "currentAlarmInfo": "/current-alarm-info"
+        },
+        "websocket": {
+            "alarmInfoEventKey": "ws-alarm-info"
+        }
+    }
+}

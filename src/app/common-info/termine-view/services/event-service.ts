@@ -3,6 +3,7 @@ import { EventItem } from './../event-item';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map } from 'rxjs/operators';
+import { AppConfig } from '../../../services/app-config.service';
 
 
 /**
@@ -15,8 +16,8 @@ import { map } from 'rxjs/operators';
 export class EventService {
 
     private _endpoint = 'https://www.googleapis.com/calendar/v3/calendars/';
-    private _calendarId = encodeURIComponent('nba5ul4kfa3q1ukhukqme7q870@group.calendar.google.com');
-    private _apiKey = environment.googleMapsKey;
+    private _calendarId = encodeURIComponent(AppConfig.settings.googleCalendarId);
+    private _apiKey = AppConfig.settings.googleMapsKey;
 
     constructor(private httpClient: HttpClient) {}
 

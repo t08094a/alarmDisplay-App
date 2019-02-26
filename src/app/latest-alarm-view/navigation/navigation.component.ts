@@ -1,13 +1,14 @@
 /// <reference types="@types/googlemaps" />
 
-import { Component, NgZone, OnInit, OnDestroy } from '@angular/core';
-import { MouseEvent, MapsAPILoader, LatLng } from '@agm/core';
+import { Component, NgZone, OnInit, OnDestroy, Inject } from '@angular/core';
+import { MouseEvent, MapsAPILoader, LatLng, LAZY_MAPS_API_CONFIG } from '@agm/core';
 import { GMapsService } from './gmaps-service.service';
 import { AlarmObserverService } from '../alarm-info/services/alarm-observer.service';
 import { Subscription } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { PlaceOfAction } from '../alarm-info/models/placeOfAction.model';
 import { AlarmInfo } from './../alarm-info/models/alarm-info.model';
+import { AppConfig } from '../../services/app-config.service';
 
 @Component({
     selector: 'app-navigation',
@@ -19,17 +20,22 @@ export class NavigationComponent implements OnInit, OnDestroy {
     public title = 'Einsatz Navigation';
     public zoom = 17;
     public dir: any = undefined;
-    public startLocation = environment.navigationStartPoint;
+    public startLocation = AppConfig.settings.navigation.startPoint;
 
-    private origin = environment.navigationStartPoint;
+    private origin = AppConfig.settings.navigation.startPoint;
     private alarmInfoSubscription: Subscription;
 
     constructor(
+        @Inject(LAZY_MAPS_API_CONFIG) config: any,
         private mapsAPILoader: MapsAPILoader,
         private gMapsService: GMapsService,
         private __zone: NgZone,
         private alarmObserver: AlarmObserverService
-    ) {}
+    ) {
+        if (config) {
+            config.apiKey = AppConfig.settings.googleMapsKey;
+        }
+    }
 
     ngOnInit() {
         // load places autocomplete

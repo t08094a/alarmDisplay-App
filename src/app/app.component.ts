@@ -1,3 +1,4 @@
+import { AppConfig } from './services/app-config.service';
 import { AlarmObserverService } from './latest-alarm-view/alarm-info/services/alarm-observer.service';
 import { environment } from './../environments/environment';
 import { Component, OnDestroy } from '@angular/core';
@@ -13,14 +14,14 @@ import { Subscription } from 'rxjs';
 })
 export class AppComponent implements OnDestroy {
     private alarmInfoSubscription: Subscription;
-    title: string = environment.applicationTitle;
+    title: string = AppConfig.settings.applicationTitle;
     appVersion: string = environment.VERSION;
     production: string = environment.production ? 'production' : 'development';
 
     public constructor(alarmObserver: AlarmObserverService,
                        private titleService: Title,
                        private router: Router) {
-        this.titleService.setTitle(environment.applicationTitle);
+        this.titleService.setTitle(AppConfig.settings.applicationTitle);
 
         this.alarmInfoSubscription = alarmObserver.alarmInfoAnnounced$.subscribe(alarmInfo => {
             if (alarmInfo) {

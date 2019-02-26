@@ -1,12 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, OnDestroy } from '@angular/core';
 import { Subject, timer } from 'rxjs';
-import { Socket } from 'ngx-socket-io';
 
-import { environment } from './../../../../environments/environment';
 import { AlarmInfo } from './../models/alarm-info.model';
 import { takeUntil } from 'rxjs/operators';
 import { GeoTransformatorService } from './geo-transformator.service';
+import { AppConfig } from '../../../services/app-config.service';
+import { SocketLatestAlarmInfo } from './socket-latest-alarm-info';
 
 @Injectable({providedIn: 'root'})
 export class AlarmObserverService implements OnDestroy {
@@ -22,12 +22,12 @@ export class AlarmObserverService implements OnDestroy {
 
     constructor(
         private httpClient: HttpClient,
-        private socket: Socket,
+        private socket: SocketLatestAlarmInfo,
         private geoTransformationService: GeoTransformatorService
     ) {
-        this.dataserverUrl = `${environment.dataserver.url}:${environment.dataserver.port}`;
-        this.apiCurrentAlarmInfo = `${environment.dataserver.restApi.currentAlarmInfo}`;
-        this.eventKey = environment.dataserver.websocket.alarmInfoEventKey;
+        this.dataserverUrl = `${AppConfig.settings.dataserver.url}:${AppConfig.settings.dataserver.port}`;
+        this.apiCurrentAlarmInfo = `${AppConfig.settings.dataserver.restResources.currentAlarmInfo}`;
+        this.eventKey = AppConfig.settings.dataserver.websocket.alarmInfoEventKey;
 
         this.initialize();
     }

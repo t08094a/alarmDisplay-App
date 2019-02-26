@@ -51,7 +51,24 @@
                   "with": "src/environments/environment.prod.ts"
                 }
               ]
-            }
+            },
+            "docker": {
+                "optimization": true,
+                "outputHashing": "all",
+                "sourceMap": false,
+                "extractCss": true,
+                "namedChunks": false,
+                "aot": true,
+                "extractLicenses": true,
+                "vendorChunk": false,
+                "buildOptimizer": true,
+                "fileReplacements": [
+                  {
+                    "replace": "src/assets/app-config.json",
+                    "with": "src/assets/app-config.docker.json"
+                  }
+                ]
+              }
           }
         },
         "serve": {

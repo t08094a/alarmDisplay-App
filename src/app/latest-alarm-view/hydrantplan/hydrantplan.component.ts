@@ -1,3 +1,4 @@
+import { AppConfig } from './../../services/app-config.service';
 import { AlarmInfo } from './../alarm-info/models/alarm-info.model';
 import { Component, OnDestroy } from '@angular/core';
 // tslint:disable-next-line:max-line-length
@@ -36,7 +37,7 @@ export class HydrantplanComponent implements OnDestroy {
         }
     );
 
-    private ziel: Marker = marker([49.527352, 10.487624], {
+    private ziel: Marker = marker([AppConfig.settings.navigation.startPoint.lat, AppConfig.settings.navigation.startPoint.lng], {
         icon: icon({
             iconSize: [25, 41],
             iconAnchor: [13, 41],
@@ -63,7 +64,7 @@ export class HydrantplanComponent implements OnDestroy {
     options: MapOptions = {
         layers: [this.openStreetMap, this.ziel, this.radiusCircle],
         zoom: this.zoomLevel,
-        center: latLng([environment.navigationStartPoint.lat, environment.navigationStartPoint.lng]),
+        center: latLng([AppConfig.settings.navigation.startPoint.lat, AppConfig.settings.navigation.startPoint.lng]),
         zoomControl: null
     };
 
@@ -120,7 +121,7 @@ export class HydrantplanComponent implements OnDestroy {
             alarmInfo.placeOfAction === null || alarmInfo.placeOfAction === undefined) {
             console.log('[HydrantplanComponent] alarm info is not set -> reset marker to home');
 
-            incomingGeoPosition = [Number(environment.navigationStartPoint.lat), Number(environment.navigationStartPoint.lng)];
+            incomingGeoPosition = [AppConfig.settings.navigation.startPoint.lat, AppConfig.settings.navigation.startPoint.lng];
         } else {
             const position = alarmInfo.placeOfAction.geoPosition;
             incomingGeoPosition = [Number(position.lat), Number(position.lng)];

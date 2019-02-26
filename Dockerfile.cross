@@ -21,7 +21,7 @@ COPY . .
 
 # build the angular app in production mode and store the artifacts in dist folder
 RUN ng --version
-RUN yarn build --prod --verbose
+RUN yarn build --configuration=docker --progress --verbose
 
 
 ##################
@@ -40,8 +40,14 @@ RUN rm -rf /usr/share/nginx/html/*
 # copy artifact build from the 'build stage'
 COPY --from=builder /app/dist /usr/share/nginx/html
 
+# copy script to replace config placeholders with docker environment ones
+COPY replace_environment_configs.sh /replace_environment_configs.sh
+RUN chmod +x /replace_environment_configs.sh
+
 # expose port 80
 EXPOSE 80
+
+ENTRYPOINT [ "sh", "/replace_environment_configs.sh", "/usr/share/nginx/html/assets/app-config.json" ]
 
 # run nginx
 CMD ["nginx", "-g", "daemon off;"]
