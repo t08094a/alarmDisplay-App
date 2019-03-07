@@ -40,14 +40,12 @@ export class NavigationComponent implements OnInit, OnDestroy {
     ngOnInit() {
         // load places autocomplete
         this.mapsAPILoader.load().then(() => {
-            this.alarmInfoSubscription = this.alarmObserver.alarmInfoAnnounced$.subscribe(data => {
-                let alarmInfo = data;
+            this.alarmInfoSubscription = this.alarmObserver.getAlarmInfo().subscribe(alarmInfo => {
 
                 if (alarmInfo) {
-                    console.log('[NavigationComponent] got alarmInfoAnnounced');
+                    console.log('[NavigationComponent] got alarm info announced');
                 } else {
-                    console.log('[NavigationComponent] got alarmInfoAnnounced with no alarm info data');
-                    alarmInfo = this.alarmObserver.currentAlarmInfo;
+                    console.log('[NavigationComponent] got alarm info announced with no alarm info data');
                 }
 
                 this.renderDirections(alarmInfo);
@@ -58,12 +56,8 @@ export class NavigationComponent implements OnInit, OnDestroy {
                 this.renderDirections(null);
             },
             () => {
-                console.log('[NavigationComponent] alarmInfoAnnounced completed');
+                console.log('[NavigationComponent] alarm info announced completed');
             });
-
-            // tslint:disable-next-line:max-line-length
-            console.log('[NavigationComponent] initial rendering the current active alarmInfo');
-            this.renderDirections(this.alarmObserver.currentAlarmInfo);
         });
     }
 

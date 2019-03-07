@@ -1,5 +1,6 @@
 {
     "applicationTitle": "Feuerwehr Alarm Info Display - Development",
+    "alarmInfoTimeout": 60000,
     "googleMapsKey": "AIzaSyCxA9zyYW8cK3Ys4HpG_xIP3V3HxQ-3msQ",
     "googleCalendarId": "nba5ul4kfa3q1ukhukqme7q870@group.calendar.google.com",
     "navigation": {

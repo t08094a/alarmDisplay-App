@@ -1,5 +1,6 @@
 export interface IAppConfig {
     applicationTitle: string;
+    alarmInfoTimeout: number;
     googleMapsKey: string;
     googleCalendarId: string;
     navigation: {

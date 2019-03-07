@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { AppConfig } from '../services/app-config.service';
 
 @Component({
   selector: 'app-latest-alarm-view',
@@ -7,9 +9,13 @@ import { Component, OnInit } from '@angular/core';
 })
 export class LatestAlarmViewComponent implements OnInit {
 
-  constructor() { }
+  constructor(private router: Router) { }
 
   ngOnInit() {
-  }
+    setTimeout(() => {
+        console.log('[LatestAlarmViewComponent] timeout occured -> change to "common-info" page');
 
+        this.router.navigate(['common-info']);
+    }, AppConfig.settings.alarmInfoTimeout);
+  }
 }

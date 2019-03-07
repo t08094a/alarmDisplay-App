@@ -7,7 +7,6 @@ import { OverpassService } from './services/overpass.service';
 import { MarkerCreatorService } from './services/marker-creator.service';
 import { AlarmObserverService } from '../alarm-info/services/alarm-observer.service';
 import { Subscription } from 'rxjs';
-import { environment } from '../../../environments/environment.prod';
 
 @Component({
     selector: 'app-hydrantplan',
@@ -84,17 +83,15 @@ export class HydrantplanComponent implements OnDestroy {
     public onMapReady(map: Map): void {
         this.map = map;
 
-        this.alarmInfoSubscription = this.alarmObserver.alarmInfoAnnounced$.subscribe(data => {
-            let alarmInfo = data;
+        this.alarmInfoSubscription = this.alarmObserver.getAlarmInfo().subscribe(alarmInfo => {
 
-            if (alarmInfo) {
+            if (alarmInfo != null) {
                 console.log('[HydrantplanComponent] got alarmInfoAnnounced');
-            } else {
-                console.log('[HydrantplanComponent] got alarmInfoAnnounced with no alarm info data, try to use cached one');
-                alarmInfo = this.alarmObserver.currentAlarmInfo;
-            }
 
-            this.updateMap(alarmInfo);
+                this.updateMap(alarmInfo);
+            } else {
+                this.updateMap(null);
+            }
         },
         error => {
             console.error(error);
@@ -104,21 +101,17 @@ export class HydrantplanComponent implements OnDestroy {
         () => {
             console.log('[HydrantplanComponent] alarmInfoAnnounced completed');
         });
-
-        console.log('[HydrantplanComponent] initial rendering the current active alarmInfo');
-        this.updateMap(this.alarmObserver.currentAlarmInfo);
     }
 
     private updateMap(alarmInfo: AlarmInfo): void {
-        if (this.map === null) {
+        if (this.map == null) {
             console.warn('[HydrantplanComponent] map not ready to show informations');
             return;
         }
 
         let incomingGeoPosition: LatLngTuple = null;
 
-        if (alarmInfo === null || alarmInfo === undefined ||
-            alarmInfo.placeOfAction === null || alarmInfo.placeOfAction === undefined) {
+        if (alarmInfo == null || alarmInfo.placeOfAction == null) {
             console.log('[HydrantplanComponent] alarm info is not set -> reset marker to home');
 
             incomingGeoPosition = [AppConfig.settings.navigation.startPoint.lat, AppConfig.settings.navigation.startPoint.lng];

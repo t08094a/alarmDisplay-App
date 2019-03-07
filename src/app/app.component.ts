@@ -23,22 +23,15 @@ export class AppComponent implements OnDestroy {
                        private router: Router) {
         this.titleService.setTitle(AppConfig.settings.applicationTitle);
 
-        this.alarmInfoSubscription = alarmObserver.alarmInfoAnnounced$.subscribe(alarmInfo => {
+        this.alarmInfoSubscription = alarmObserver.getAlarmInfo().subscribe(alarmInfo => {
             if (alarmInfo) {
-                console.log('[AppComponent] received new alarm info');
-
+                console.log('[AppComponent] received new alarm info -> show alarm info page');
                 this.navigateTo('alarm-info');
             } else {
-                console.log('[AppComponent] received no alarm info');
+                console.log('[AppComponent] received no alarm info -> show common infos page');
                 this.navigateTo('common-info');
             }
         });
-
-        if (alarmObserver.currentAlarmInfo) {
-            console.log('[AppComponent] current alarm already present');
-
-            this.navigateTo('alarm-info');
-        }
     }
 
     ngOnDestroy(): void {

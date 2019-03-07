@@ -1,17 +1,33 @@
 import { CommonInfoItem, CommonInfoItemImpl } from './common-info-item';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 
 @Component({
     selector: 'app-info-view',
     templateUrl: './info-view.component.html',
     styleUrls: ['./info-view.component.css']
 })
-export class InfoViewComponent implements OnInit {
+export class InfoViewComponent implements OnInit, OnDestroy {
+    private interval: any;
     public items: CommonInfoItem[];
 
     constructor() {}
 
     ngOnInit() {
+        this.refreshData();
+
+        this.interval = setInterval(() => {
+            console.log('[InfoViewComponent] interval occured -> refresh data');
+            this.refreshData();
+        }, 1800000); // refresh all 30 minutes
+    }
+
+    ngOnDestroy() {
+        clearInterval(this.interval);
+    }
+
+    private refreshData() {
+        console.log('[InfoViewComponent] refresh data');
+
         this.items = [
             new CommonInfoItemImpl('T1', 'd1'),
             new CommonInfoItemImpl('T2', 'd1', new Date('2018-04-01'), new Date('2018-05-01')),
@@ -20,7 +36,7 @@ export class InfoViewComponent implements OnInit {
             new CommonInfoItemImpl('T5', 'd1', new Date('2018-04-01'), new Date('2018-05-27')),
             new CommonInfoItemImpl('T6', 'd1', new Date('2018-04-01'), new Date('2018-05-06'))
         ].filter(this.filterInfoItemsToDateRelevant())
-        .sort(this.ortInfoItemsByDate());
+         .sort(this.ortInfoItemsByDate());
     }
 
     private ortInfoItemsByDate() {

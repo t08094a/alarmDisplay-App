@@ -1,9 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, OnDestroy } from '@angular/core';
-import { Subject, timer } from 'rxjs';
+import { Observable, BehaviorSubject } from 'rxjs';
 
 import { AlarmInfo } from './../models/alarm-info.model';
-import { takeUntil } from 'rxjs/operators';
 import { GeoTransformatorService } from './geo-transformator.service';
 import { AppConfig } from '../../../services/app-config.service';
 import { SocketLatestAlarmInfo } from './socket-latest-alarm-info';
@@ -13,18 +12,12 @@ export class AlarmObserverService implements OnDestroy {
     private dataserverUrl: string;
     private apiCurrentAlarmInfo: string;
     private eventKey: string;
-    private currentAlarmInfoSource: Subject<AlarmInfo> = new Subject<AlarmInfo>();
-    private unsubscribeTimer = new Subject();
-    public currentAlarmInfo: AlarmInfo;
+    // use of BehaviorSubject to get always the last value in cache, initialize it with null
+    private currentAlarmInfoSource: BehaviorSubject<AlarmInfo> = new BehaviorSubject<AlarmInfo>(null);
 
-    // observable alarm info stream
-    public alarmInfoAnnounced$ = this.currentAlarmInfoSource.asObservable();
-
-    constructor(
-        private httpClient: HttpClient,
-        private socket: SocketLatestAlarmInfo,
-        private geoTransformationService: GeoTransformatorService
-    ) {
+    constructor(private httpClient: HttpClient,
+                private socket: SocketLatestAlarmInfo,
+                private geoTransformationService: GeoTransformatorService) {
         this.dataserverUrl = `${AppConfig.settings.dataserver.url}:${AppConfig.settings.dataserver.port}`;
         this.apiCurrentAlarmInfo = `${AppConfig.settings.dataserver.restResources.currentAlarmInfo}`;
         this.eventKey = AppConfig.settings.dataserver.websocket.alarmInfoEventKey;
@@ -48,36 +41,28 @@ export class AlarmObserverService implements OnDestroy {
     ngOnDestroy(): void {
         this.socket.disconnect();
 
-        this.unsubscribeTimer.next();
-        this.unsubscribeTimer.complete();
+        this.currentAlarmInfoSource.complete();
+    }
+
+    /**
+     * Gets the alarm infos as {Observable<AlarmInfo>}. {null} is an allowed value.
+     * @returns {Observable<AlarmInfo>}
+     * @memberof AlarmObserverService
+     */
+    public getAlarmInfo(): Observable<AlarmInfo> {
+        return this.currentAlarmInfoSource.asObservable();
     }
 
     // Service message commands
     private announceAlarmInfo(alarmInfo: AlarmInfo): void {
+        if (alarmInfo == null) {
+            return;
+        }
 
         this.transformGKtoWks84Coordinats(alarmInfo);
-        this.currentAlarmInfo = alarmInfo;
 
-        console.log('[AlarmObserverService] publish the alarm info to internal components');
+        console.log('[AlarmObserverService] publish the alarm info to observing components');
         this.currentAlarmInfoSource.next(alarmInfo);
-
-        if (alarmInfo !== null || alarmInfo !== undefined) {
-            // reset after 15 minutes = 900000
-            timer(900000, 900000).pipe(takeUntil(this.unsubscribeTimer)).subscribe(t => {
-                console.log('[AlarmObserverService] timer event occured -> reset current alarm info');
-
-                this.currentAlarmInfo = null;
-                this.currentAlarmInfoSource.next(alarmInfo);
-
-                console.log('[AlarmObserverService] reset timer');
-                this.unsubscribeTimer.next();
-            });
-        } else {
-            // terminate current timers
-            this.unsubscribeTimer.next();
-
-            console.log('[AlarmObserverService] reset timer event');
-        }
     }
 
     private transformGKtoWks84Coordinats(alarmInfo: AlarmInfo): void {

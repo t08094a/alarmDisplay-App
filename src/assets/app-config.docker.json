@@ -1,12 +1,13 @@
 // NOTE: #{...} are placeholders that are replaced during deployment
 {
     "applicationTitle": "#{ADA_APPLICATION_TITLE}",
+    "alarmInfoTimeout": #{ADA_ALARMINFO_TIMEOUT},
     "googleMapsKey": "#{ADA_GOOGLE_MAPS_KEY}",
     "googleCalendarId": "#{ADA_GOOGLE_CALENDAR_ID}",
     "navigation": {
         "startPoint": {
-            "lat": "#{ADA_NAVIGATION_START_POINT_LAT}",
-            "lng": "#{ADA_NAVIGATION_START_POINT_LNG}"
+            "lat": #{ADA_NAVIGATION_START_POINT_LAT},
+            "lng": #{ADA_NAVIGATION_START_POINT_LNG}
         }
     },
     "dataserver": {
