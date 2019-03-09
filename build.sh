@@ -32,7 +32,12 @@ case ${build_uname_arch} in
     ;;
 esac
 
-docker_bin_path=$(readlink -f $( type -P docker-${build_os}-${build_arch} || type -P ${DOCKER_CLI_PATH%/}/docker-${build_os}-${build_arch} || echo docker-not-found ))
+#docker_bin_path=$(readlink -f $( type -P docker-${build_os}-${build_arch} || type -P ${DOCKER_CLI_PATH%/}/docker-${build_os}-${build_arch} || echo docker-not-found ))
+
+docker_bin_path=$( which docker )
+export DOCKER_CLI_EXPERIMENTAL=enabled
+
+echo DOCKER_CLI_EXPERIMENTAL: ${DOCKER_CLI_EXPERIMENTAL}
 echo docker_bin_path: ${docker_bin_path}
 
 if [[ ! -x ${docker_bin_path} ]]; then
