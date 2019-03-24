@@ -34,8 +34,10 @@ __CROSS_COPY qemu/qemu-__QEMU_ARCH__-static /usr/bin/qemu-__QEMU_ARCH__-static
 RUN apk add --no-cache bash 2>/dev/null || apt install bash 2>/dev/null
 
 # copy script to replace config placeholders with docker environment ones
-COPY replace_environment_configs.sh /
-RUN chmod +x /replace_environment_configs.sh
+COPY startup.sh replace_environment_configs.sh /
+
+RUN chmod +x /replace_environment_configs.sh && \
+    chmod +x /startup.sh 
 
 # copy our default nginx config
 COPY nginx/default.conf /etc/nginx/conf.d/
@@ -49,7 +51,5 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 # expose port 80
 EXPOSE 80
 
-ENTRYPOINT [ "/replace_environment_configs.sh", "/usr/share/nginx/html/assets/app-config.json" ]
+ENTRYPOINT [ "/startup.sh" ]
 
-# run nginx
-CMD ["nginx", "-g", "daemon off;"]
