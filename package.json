@@ -1,6 +1,6 @@
 {
   "name": "alarm-display-app",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Alarm display app based on Node.js and Docker",
   "author": "Jochen Fähnlein <jochen.faehnlein@ff-ipsheim.de>",
   "license": "GPL 3.0",
