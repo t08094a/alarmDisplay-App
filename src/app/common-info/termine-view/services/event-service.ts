@@ -51,9 +51,15 @@ export class EventService {
         const items: EventItem[] = [];
 
         value['items'].forEach(element => {
+
+            let description: string = element['description'];
+            if (description) {
+                description = description.replace('\n', '<br />');
+            }
+
             items.push({
                 title: element['summary'],
-                description: element['description'],
+                description: description,
                 date: element['start']['dateTime'],
                 location: element['location']
             });

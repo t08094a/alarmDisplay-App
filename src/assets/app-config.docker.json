@@ -1,5 +1,5 @@
-// NOTE: #{...} are placeholders that are replaced during deployment
 {
+    "__COMMENT__": "NOTE: #{...} are placeholders that are replaced during deployment",
     "applicationTitle": "#{ADA_APPLICATION_TITLE}",
     "alarmInfoTimeout": #{ADA_ALARMINFO_TIMEOUT},
     "googleMapsKey": "#{ADA_GOOGLE_MAPS_KEY}",

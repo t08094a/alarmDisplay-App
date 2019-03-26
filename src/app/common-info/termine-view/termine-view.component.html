@@ -2,10 +2,11 @@
 
 <div class="termine">
     <div class="termin" *ngFor="let event of events" >
-        <h2 class="eventTitle">
+        <h1 class="eventTitle">
             <i class="titleIcon fa fa-calendar"></i>
-            {{ event.date | date: 'dd.MM.yyyy' }} - {{ event.title }}</h2>
-        <p *ngIf="event.location" >Ort: {{ event.location }}</p>
-        <p *ngIf="event.description" [innerHTML]="event.description"></p>
+            {{ event.date | date: 'dd.MM.yyyy' }} - {{ event.title }}
+        </h1>
+        <p class="eventContent" *ngIf="event.location" >Ort: {{ event.location }}</p>
+        <p class="eventContent" *ngIf="event.description" [innerHTML]="event.description"></p>
     </div>
 </div>
