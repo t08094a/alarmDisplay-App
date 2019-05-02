@@ -1,20 +1,16 @@
 /// <reference types="@types/googlemaps" />
 
-import { Component, NgZone, OnInit, OnDestroy, Inject } from '@angular/core';
-import { MouseEvent, MapsAPILoader, LatLng, LAZY_MAPS_API_CONFIG } from '@agm/core';
-import { GMapsService } from './gmaps-service.service';
+import { Component, OnInit, OnDestroy, Inject } from '@angular/core';
+import { MouseEvent, MapsAPILoader, LAZY_MAPS_API_CONFIG } from '@agm/core';
 import { AlarmObserverService } from '../alarm-info/services/alarm-observer.service';
 import { Subscription } from 'rxjs';
-import { environment } from '../../../environments/environment';
-import { PlaceOfAction } from '../alarm-info/models/placeOfAction.model';
 import { AlarmInfo } from './../alarm-info/models/alarm-info.model';
 import { AppConfig } from '../../services/app-config.service';
 
 @Component({
     selector: 'app-navigation',
     templateUrl: './navigation.component.html',
-    styleUrls: ['./navigation.component.css'],
-    providers: [GMapsService]
+    styleUrls: ['./navigation.component.css']
 })
 export class NavigationComponent implements OnInit, OnDestroy {
     public title = 'Einsatz Navigation';
@@ -28,8 +24,6 @@ export class NavigationComponent implements OnInit, OnDestroy {
     constructor(
         @Inject(LAZY_MAPS_API_CONFIG) config: any,
         private mapsAPILoader: MapsAPILoader,
-        private gMapsService: GMapsService,
-        private __zone: NgZone,
         private alarmObserver: AlarmObserverService
     ) {
         if (config) {
@@ -80,7 +74,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
 
         const incomingWgs84Position = alarmInfo.placeOfAction.geoPosition;
 
-        if (incomingWgs84Position !== null && incomingWgs84Position !== undefined) {
+        if (incomingWgs84Position) {
             console.log(`[NavigationComponent] route to lat: ${incomingWgs84Position.lat}; lng: ${incomingWgs84Position.lng}`);
 
             this.dir = {
@@ -89,28 +83,8 @@ export class NavigationComponent implements OnInit, OnDestroy {
                 travelMode: google.maps.TravelMode.DRIVING
             };
         } else {
-            // get lat lng based on the address
-            this.setRoutingTargetBasedOnAddress(alarmInfo.placeOfAction);
+            console.log('[NavigationComponent] incomingWgs84Position is not defined -> unable to route');
         }
-    }
-
-    private setRoutingTargetBasedOnAddress(placeOfAction: PlaceOfAction) {
-        console.log(`[NavigationComponent] get LatLng for ${placeOfAction.adressAsCombinedString}`);
-
-        this.gMapsService.getLatLng(placeOfAction.adressAsCombinedString).subscribe(result => {
-            this.__zone.run(() => {
-                const destinationLatLng = {
-                    lat: result.lat(),
-                    lng: result.lng()
-                };
-                console.log(`[NavigationComponent] Found LatLng: ${destinationLatLng}`);
-                this.dir = {
-                    origin: this.origin,
-                    destination: destinationLatLng,
-                    travelMode: google.maps.TravelMode.DRIVING
-                };
-            });
-        }, error => console.log(error), () => console.log('[NavigationComponent] Get LatLng based on destination address completed!'));
     }
 
     onMapClicked(event: MouseEvent) {

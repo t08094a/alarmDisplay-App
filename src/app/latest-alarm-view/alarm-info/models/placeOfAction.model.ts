@@ -5,6 +5,6 @@ export interface PlaceOfAction {
     readonly houseNumber?: string;
     readonly city?: string;
     readonly addition?: string;
-    geoPosition?: GeoPosition;
+    geoPosition: GeoPosition | null;
     adressAsCombinedString?: string;
 }

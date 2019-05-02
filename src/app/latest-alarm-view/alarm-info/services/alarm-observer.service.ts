@@ -6,6 +6,7 @@ import { AlarmInfo } from './../models/alarm-info.model';
 import { GeoTransformatorService } from './geo-transformator.service';
 import { AppConfig } from '../../../services/app-config.service';
 import { SocketLatestAlarmInfo } from './socket-latest-alarm-info';
+import { GeoCodingService } from './geocoding.service';
 
 @Injectable({providedIn: 'root'})
 export class AlarmObserverService implements OnDestroy {
@@ -17,7 +18,8 @@ export class AlarmObserverService implements OnDestroy {
 
     constructor(private httpClient: HttpClient,
                 private socket: SocketLatestAlarmInfo,
-                private geoTransformationService: GeoTransformatorService) {
+                private geoTransformationService: GeoTransformatorService,
+                private geocodingService: GeoCodingService) {
         this.dataserverUrl = `${AppConfig.settings.dataserver.url}:${AppConfig.settings.dataserver.port}`;
         this.apiCurrentAlarmInfo = `${AppConfig.settings.dataserver.restResources.currentAlarmInfo}`;
         this.eventKey = AppConfig.settings.dataserver.websocket.alarmInfoEventKey;
@@ -59,32 +61,61 @@ export class AlarmObserverService implements OnDestroy {
             return;
         }
 
-        this.transformGKtoWks84Coordinats(alarmInfo);
+        if (alarmInfo.placeOfAction) {
+            let observer: Observable<AlarmInfo>;
 
-        console.log('[AlarmObserverService] publish the alarm info to observing components');
-        this.currentAlarmInfoSource.next(alarmInfo);
+            if (alarmInfo.placeOfAction.geoPosition) {
+                observer = this.transformGKtoWks84Coordinats(alarmInfo);
+            } else if (alarmInfo.placeOfAction.adressAsCombinedString) {
+                observer = this.getCoordinatesFromTargetAddress(alarmInfo);
+            }
+
+            if (observer) {
+                observer.subscribe(result => {
+                    console.log('[AlarmObserverService] publish the alarm info to observing components');
+                    this.currentAlarmInfoSource.next(result);
+                });
+            }
+        }
     }
 
-    private transformGKtoWks84Coordinats(alarmInfo: AlarmInfo): void {
-        if (alarmInfo === null || alarmInfo === undefined ||
-            alarmInfo.placeOfAction === null || alarmInfo.placeOfAction === undefined ||
-            alarmInfo.placeOfAction.geoPosition === null || alarmInfo.placeOfAction.geoPosition === undefined) {
-            return;
-        }
+    private transformGKtoWks84Coordinats(alarmInfo: AlarmInfo): Observable<AlarmInfo> {
 
-        const incomingGeoPosition = alarmInfo.placeOfAction.geoPosition;
+        return new Observable<AlarmInfo>(observer => {
+            const incomingGeoPosition = alarmInfo.placeOfAction.geoPosition;
 
-        // get lat lng based on given Gauß Krüger coordinates
-        const east = incomingGeoPosition.x;
-        const north = incomingGeoPosition.y;
+            // get lat lng based on given Gauß Krüger coordinates
+            const east = incomingGeoPosition.x;
+            const north = incomingGeoPosition.y;
 
-        const wgs84Position = this.geoTransformationService.transformGaussKruegerToWsg84(east, north);
+            const wgs84Position = this.geoTransformationService.transformGaussKruegerToWsg84(east, north);
 
-        // tslint:disable-next-line:max-line-length
-        console.log(`[AlarmObserverService] transformed GK [east: ${east}; north: ${north}] to WGS84: [lat: ${wgs84Position.lat}; lng: ${wgs84Position.lng}]`);
+            // tslint:disable-next-line:max-line-length
+            console.log(`[AlarmObserverService] transformed GK [east: ${east}; north: ${north}] to WGS84: [lat: ${wgs84Position.lat}; lng: ${wgs84Position.lng}]`);
 
-        alarmInfo.placeOfAction.geoPosition.lat = wgs84Position.lat;
-        alarmInfo.placeOfAction.geoPosition.lng = wgs84Position.lng;
+            alarmInfo.placeOfAction.geoPosition.lat = wgs84Position.lat;
+            alarmInfo.placeOfAction.geoPosition.lng = wgs84Position.lng;
+
+            observer.next(alarmInfo);
+            observer.complete();
+        });
+    }
+
+    private getCoordinatesFromTargetAddress(alarmInfo: AlarmInfo): Observable<AlarmInfo> {
+
+        console.log(`[AlarmObserverService] get LatLng based on given address: ${alarmInfo.placeOfAction.adressAsCombinedString}`);
+
+        return new Observable<AlarmInfo>(observer => {
+                this.geocodingService.getLatLng(alarmInfo.placeOfAction.adressAsCombinedString).subscribe(result => {
+
+                    console.log(`[AlarmObserverService] Found LatLng: ${result.lat}, ${result.lng}`);
+
+                    alarmInfo.placeOfAction.geoPosition = result;
+
+                    observer.next(alarmInfo);
+                    observer.complete();
+            }, error => console.log(error), () => console.log('[AlarmObserverService] Get LatLng based on destination address completed!'));
+        });
     }
 
     /**
