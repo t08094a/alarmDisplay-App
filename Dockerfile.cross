@@ -29,6 +29,21 @@ RUN yarn build --configuration=docker --progress --verbose
 ##################
 FROM __BASEIMAGE_ARCH__/nginx:__NGINX_TAG__
 
+ENV ADA_APPLICATION_TITLE="Feuerwehr Alarm Info Display" \
+    # timeout to change from alarminfo page to common info page; unit is milliseconds
+    ADA_ALARMINFO_TIMEOUT=60000 \
+    # google maps key (see https://developers.google.com/maps/documentation/javascript/get-api-key)
+    ADA_GOOGLE_MAPS_KEY="AIzaSyCxA9zyYW8cK3Ys4HpG_xIP3V3HxQ-3msQ" \
+    ADA_GOOGLE_CALENDAR_ID="nba5ul4kfa3q1ukhukqme7q870@group.calendar.google.com" \
+    # dataserver endpoint
+    ADA_DATASERVER_URL="http://localhost" \
+    ADA_DATASERVER_PORT=9002 \
+    ADA_DATASERVER_REST_RESOURCE_CURRENT_ALARM_INFO="/current-alarm-info" \
+    ADA_DATASERVER_WEBSOCKET_ALARM_INFO_EVENT_KEY="ws-alarm-info" \
+    # Navigation start point e.g. the local firedepartement
+    ADA_NAVIGATION_START_POINT_LAT="49.526558948981595" \
+    ADA_NAVIGATION_START_POINT_LNG="10.483931601047516"
+
 __CROSS_COPY qemu/qemu-__QEMU_ARCH__-static /usr/bin/qemu-__QEMU_ARCH__-static
 
 RUN apk add --no-cache bash 2>/dev/null || apt install bash 2>/dev/null
@@ -37,7 +52,7 @@ RUN apk add --no-cache bash 2>/dev/null || apt install bash 2>/dev/null
 COPY startup.sh replace_environment_configs.sh /
 
 RUN chmod +x /replace_environment_configs.sh && \
-    chmod +x /startup.sh 
+    chmod +x /startup.sh
 
 # copy our default nginx config
 COPY nginx/default.conf /etc/nginx/conf.d/

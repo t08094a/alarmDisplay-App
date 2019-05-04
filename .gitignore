@@ -53,6 +53,8 @@ docker-linux-amd64
 
 # Docker
 docker-linux-amd64
+Dockerfile.*
+!Dockerfile.cross
 
 # qemu
 /qemu
